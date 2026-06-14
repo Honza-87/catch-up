@@ -44,7 +44,8 @@ alternatives.
 
 - **Decision**: `POST /auth/request-link` always returns `202 Accepted` with the
   same body, whether or not the email is on the roster. A link is only generated +
-  emailed for roster emails. Rate-limit by email + IP.
+  emailed for roster emails. Rate-limit by email + IP (default 5 per email/hour,
+  20 per IP/hour; configurable).
 - **Rationale**: FR-004 / SC-003 — responses must not reveal roster membership.
 - **Alternatives**: 404 for unknown email (leaks membership) — rejected.
 

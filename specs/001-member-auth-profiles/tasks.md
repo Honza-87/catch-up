@@ -64,7 +64,7 @@ an empty profile; non-roster email → same neutral response; reused/expired lin
 - [ ] T021 [US1] Auth service (request-link → roster check + create signin_token + send via Notifier; verify → validate + upsert member + create session; logout → revoke) in `backend/src/catchup/auth/service.py` (depends T020, T010, T012)
 - [ ] T022 [US1] Auth routers (POST /auth/request-link neutral 202, GET /auth/callback, POST /auth/logout, GET /auth/me) in `backend/src/catchup/api/auth.py` (depends T021, T016)
 - [ ] T023 [P] [US1] `catchup-roster` Typer CLI (add/remove/list) in `backend/src/catchup/cli.py` (depends T010, T008)
-- [ ] T024 [US1] Register auth router + per-email/IP rate-limit on request-link in `backend/src/catchup/app.py` (depends T022)
+- [ ] T024 [US1] Register auth router + rate-limit request-link (default 5/email/hour, 20/IP/hour, configurable) in `backend/src/catchup/app.py` (depends T022)
 - [ ] T025 [P] [US1] Frontend Login page + "check inbox" + callback handling + `useAuth` hook in `frontend/src/pages/Login.tsx`, `frontend/src/api/auth.ts`
 
 **Checkpoint**: US1 fully functional — a real classmate can sign in. MVP demoable.
@@ -127,6 +127,7 @@ profile → all shared fields visible, WhatsApp opens `wa.me`.
 - [ ] T044 Run `quickstart.md` end-to-end and fix gaps
 - [ ] T045 [P] Ensure `ruff check`, `ruff format --check`, `pytest`, `vitest` all green; document `pre-commit install`
 - [ ] T046 [P] Write `README.md` (run + deploy, mkn10-style)
+- [ ] T047 [P] Frontend component tests (vitest + RTL): Login flow, Profile form validation, Directory render + `wa.me` link in `frontend/tests/`
 
 ---
 
