@@ -23,10 +23,17 @@ def my_overlaps(member: Member = Depends(get_current_member), db: DbSession = De
     )
     rows.sort(key=lambda o: (0 if o.strength == "strong" else 1, o.start_date))
 
+    other_ids = {(o.member_b_id if o.member_a_id == member.id else o.member_a_id) for o in rows}
+    others = (
+        {m.id: m for m in db.execute(select(Member).where(Member.id.in_(other_ids))).scalars().all()}
+        if other_ids
+        else {}
+    )
+
     overlaps = []
     for o in rows:
         other_id = o.member_b_id if o.member_a_id == member.id else o.member_a_id
-        other = db.get(Member, other_id)
+        other = others[other_id]
         overlaps.append(
             OverlapSchema(
                 id=o.id,

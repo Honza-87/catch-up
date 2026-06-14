@@ -102,6 +102,24 @@ def test_place_dedup_reuses_row(db):
     assert count == 1
 
 
+def test_manual_place_snaps_to_geocoded_row(db):
+    client = _client(_signin(db, "a@example.com"))
+    # Geocoded Lisbon, then a manual Lisbon (sentinel 0,0 coords, FR-007).
+    client.post("/trips", json=_trip_body(start="2026-07-01", end="2026-07-05"))
+    manual = {"city": "Lisbon", "country_code": "PT", "country_name": "Portugal", "lat": 0, "lng": 0}
+    resp = client.post("/trips", json=_trip_body(place=manual, start="2026-08-01", end="2026-08-05"))
+    assert resp.status_code == 201
+    # Reuses the geocoded row (real coords), so overlaps + map pins stay correct.
+    assert resp.json()["trip"]["place"]["lat"] == 38.72
+
+    from sqlalchemy import func, select
+
+    from catchup.models import Place
+
+    count = db.execute(select(func.count()).select_from(Place).where(Place.city == "Lisbon")).scalar_one()
+    assert count == 1
+
+
 def test_unauthenticated_blocked(db):
     client = TestClient(create_app())
     assert client.get("/trips/me").status_code == 401

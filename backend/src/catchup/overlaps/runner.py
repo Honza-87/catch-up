@@ -124,7 +124,8 @@ def notify_new(db: DbSession, notifier: Notifier) -> int:
 
     sent_for: dict[UUID, set[UUID]] = {o.id: set() for o in pending}
     digests = 0
-    for member_id, overlaps in by_member.items():
+    for member_id in sorted(by_member):  # deterministic send order
+        overlaps = by_member[member_id]
         member = members[member_id]
         items = [_digest_item(o, member_id, members) for o in overlaps]
         try:
