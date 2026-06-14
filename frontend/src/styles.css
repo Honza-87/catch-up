@@ -137,6 +137,11 @@ a {
   background: #f5a623;
   border-radius: 3px;
 }
+.map-pin.event {
+  background: #c061f7;
+  border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg);
+}
 .map-pin.overlap {
   box-shadow: 0 0 0 4px rgba(80, 220, 120, 0.6);
 }
@@ -145,7 +150,8 @@ a {
   outline-offset: 1px;
 }
 
-.trip-row.selected {
+.trip-row.selected,
+.event-row.selected {
   border-color: #4f7cff;
   box-shadow: 0 0 0 1px #4f7cff;
 }

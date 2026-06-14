@@ -49,10 +49,13 @@ const { ADA, TRIP } = vi.hoisted(() => ({
 
 vi.mock("../src/api/members", () => ({
   fetchMembers: vi.fn().mockResolvedValue([ADA]),
-  fetchMember: vi.fn().mockResolvedValue({ ...ADA, email: "ada@x.com", note: null, created_at: "", trips: [TRIP] }),
+  fetchMember: vi
+    .fn()
+    .mockResolvedValue({ ...ADA, email: "ada@x.com", note: null, created_at: "", trips: [TRIP], events: [] }),
 }));
 vi.mock("../src/api/trips", () => ({ listAllUpcoming: vi.fn().mockResolvedValue([TRIP]) }));
 vi.mock("../src/api/overlaps", () => ({ listMine: vi.fn().mockResolvedValue([]) }));
+vi.mock("../src/api/events", () => ({ listAllUpcoming: vi.fn().mockResolvedValue([]) }));
 
 import { Home } from "../src/pages/Home";
 

@@ -12,7 +12,7 @@ from catchup.api.schemas import ProfileUpdate
 from catchup.config import Settings
 from catchup.errors import AppError
 from catchup.members.validation import normalize_whatsapp
-from catchup.models import Member, Trip
+from catchup.models import Member, SignificantEvent, Trip
 from catchup.places.service import upsert_place
 
 _PLAIN_FIELDS = ("display_name", "job_title", "company", "note")
@@ -22,10 +22,19 @@ def get_member(db: DbSession, member_id: UUID) -> Member:
     member = db.get(Member, member_id)
     if member is None:
         raise AppError("not_found", "No such member.", status_code=404)
-    # Attach upcoming trips (sorted) so MemberDetail renders the drawer in one call.
+    # Attach upcoming trips + events (sorted) so MemberDetail renders the drawer in one call.
     today = datetime.now(UTC).date()
     member.trips = list(
         db.execute(select(Trip).where(Trip.member_id == member_id, Trip.end_date >= today).order_by(Trip.start_date))
+        .scalars()
+        .all()
+    )
+    member.events = list(
+        db.execute(
+            select(SignificantEvent)
+            .where(SignificantEvent.member_id == member_id, SignificantEvent.end_date >= today)
+            .order_by(SignificantEvent.start_date)
+        )
         .scalars()
         .all()
     )

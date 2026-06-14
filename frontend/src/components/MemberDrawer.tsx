@@ -46,6 +46,16 @@ export function MemberDrawer({ memberId, onClose }: { memberId: string | null; o
               </div>
             ))}
 
+            <h3>Events</h3>
+            {member.events.length === 0 && <p className="muted">No upcoming events.</p>}
+            {member.events.map((ev) => (
+              <div key={ev.id} className="muted">
+                🎉 {ev.title}
+                {ev.place ? ` · ${ev.place.city}` : ""} · {ev.start_date}
+                {ev.end_date !== ev.start_date ? ` → ${ev.end_date}` : ""}
+              </div>
+            ))}
+
             <p style={{ marginTop: "0.75rem" }}>
               <WhatsAppButton e164={member.whatsapp_e164} />
             </p>

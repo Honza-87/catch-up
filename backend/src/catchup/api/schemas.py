@@ -78,11 +78,38 @@ class OverlapSchema(BaseModel):
     end_date: date
 
 
+class EventSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    member: MemberLite
+    place: PlaceSchema | None  # the host's home location at read time
+    title: str
+    start_date: date
+    end_date: date
+    note: str | None
+
+
+class EventCreate(BaseModel):
+    title: str
+    start_date: date
+    end_date: date
+    note: str | None = None
+
+
+class EventUpdate(BaseModel):
+    title: str | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    note: str | None = None
+
+
 class MemberDetail(MemberSummary):
     email: str
     note: str | None
     created_at: datetime
     trips: list[TripSchema] = []
+    events: list[EventSchema] = []
 
 
 class RequestLinkBody(BaseModel):

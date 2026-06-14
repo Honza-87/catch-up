@@ -3,12 +3,14 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { logout, useMe } from "../api/auth";
+import * as eventsApi from "../api/events";
 import { updateProfile } from "../api/members";
 import * as tripsApi from "../api/trips";
+import { EventForm, type EventFormValues } from "../components/EventForm";
 import { PhotoUpload } from "../components/PhotoUpload";
 import { PlacePicker } from "../components/PlacePicker";
 import { TripForm, type TripFormValues } from "../components/TripForm";
-import type { Place, Trip } from "../types";
+import type { Place, SignificantEvent, Trip } from "../types";
 
 export function Profile() {
   const { data: me, isLoading } = useMe();
@@ -102,7 +104,79 @@ export function Profile() {
       </form>
 
       <MyTrips />
+      <MyEvents />
     </div>
+  );
+}
+
+function MyEvents() {
+  const queryClient = useQueryClient();
+  const { data: me } = useMe();
+  const { data: events, isLoading } = useQuery({ queryKey: ["events", "me"], queryFn: eventsApi.listMine });
+  const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<SignificantEvent | null>(null);
+
+  async function refresh() {
+    await queryClient.invalidateQueries({ queryKey: ["events"] });
+  }
+
+  async function save(values: EventFormValues) {
+    if (editing) await eventsApi.update(editing.id, values);
+    else await eventsApi.create(values);
+    setEditing(null);
+    setAdding(false);
+    await refresh();
+  }
+
+  async function remove(id: string) {
+    await eventsApi.remove(id);
+    await refresh();
+  }
+
+  return (
+    <section>
+      <div className="row" style={{ justifyContent: "space-between", marginTop: "1.5rem" }}>
+        <h2 style={{ margin: 0 }}>My events</h2>
+        {!adding && !editing && <button onClick={() => setAdding(true)}>Add event</button>}
+      </div>
+
+      {(adding || editing) && (
+        <EventForm
+          event={editing}
+          homePlace={me?.home_place ?? null}
+          onSubmit={save}
+          onCancel={() => {
+            setAdding(false);
+            setEditing(null);
+          }}
+        />
+      )}
+
+      {isLoading && <p className="muted">Loading…</p>}
+      {events?.length === 0 && !adding && <p className="muted">No events yet.</p>}
+
+      {events?.map((ev) => (
+        <div key={ev.id} className="card row" style={{ justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontWeight: 600 }}>🎉 {ev.title}</div>
+            <div className="muted">
+              {ev.start_date}
+              {ev.end_date !== ev.start_date ? ` → ${ev.end_date}` : ""}
+              {ev.place ? ` · ${ev.place.city}` : ""}
+              {ev.note ? ` · ${ev.note}` : ""}
+            </div>
+          </div>
+          <div className="row">
+            <button className="secondary" onClick={() => setEditing(ev)}>
+              Edit
+            </button>
+            <button className="secondary" onClick={() => remove(ev.id)}>
+              Delete
+            </button>
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }
 
