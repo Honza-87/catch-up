@@ -4,16 +4,19 @@ Guidance for Claude Code working in this repo.
 
 ## Project
 
-`catch-up` — _purpose TBD_. New repo, bootstrapped 2026-06-14 with the same
-spec-driven workflow and tooling discipline as `dokturek-mkn10`. Define the real
-scope by running `/speckit-constitution`, then `/speckit-specify` for the first
-feature.
+`catch-up` — private, invite-only web app for one high-school class to track where
+members live, what they do, and their travel plans, surfacing meet-up overlaps.
+Bootstrapped 2026-06-14 with the same spec-driven workflow and tooling discipline
+as `dokturek-mkn10`. Design: `docs/superpowers/specs/2026-06-14-catchup-design.md`;
+principles: `.specify/memory/constitution.md` (v1.0.0).
 
 ## Stack
 
-**Undecided.** No language/runtime committed yet. Pick it in the constitution
-(`/speckit-constitution`), then fill this section and add the matching tooling
-(see "Tooling" below). Until then, keep the repo stack-agnostic.
+Backend mirrors `dokturek-mkn10`: Python 3.13, uv, FastAPI, SQLAlchemy 2.x,
+alembic (sync), pydantic-settings v2, ruff (line 120), pytest. Frontend: React +
+TypeScript + Vite, react-query, react-leaflet (OSM tiles). Postgres = system of
+record; S3-compatible object storage for photos. Deploy: multi-stage Docker on
+Railway. One repo, two codebases: `backend/`, `frontend/`.
 
 ## Workflow (the mindset)
 
@@ -34,34 +37,50 @@ numbering), merge to `main`. `main` is the trunk.
 ## Tooling
 
 Hygiene hooks are wired (`.pre-commit-config.yaml`: trailing-whitespace,
-end-of-file-fixer, check-yaml, large-files, merge-conflict). Install them once
-the stack is chosen:
+end-of-file-fixer, check-yaml, large-files, merge-conflict). Backend tooling lands
+with the first implementation:
 
 ```bash
 pre-commit install
 ```
 
-**Pending stack decision** (mirror `dokturek-mkn10` once language is set):
-
-- Python → `uv` env, `ruff` (lint + format, line-length 120, `E/W/F/I/B/UP/SIM`),
-  `pytest` with `--strict-markers` + smoke markers, `alembic` if Postgres.
-  Add the `ruff` + `ruff-format` hooks to `.pre-commit-config.yaml`.
-- Other stack → port the equivalent lint/format/test loop, keep the hygiene hooks.
-
-Deploy target (Railway + multi-stage Docker, like mkn10) is also deferred until
-there's something to deploy.
+- **Backend** (`backend/`): `uv` env; `ruff` (lint + format, line-length 120,
+  `E/W/F/I/B/UP/SIM`); `pytest` with `--strict-markers` + `smoke` marker;
+  `alembic`. Add the `ruff` + `ruff-format` hooks to `.pre-commit-config.yaml`
+  when the backend is scaffolded.
+- **Frontend** (`frontend/`): Vite + TypeScript; vitest + React Testing Library.
+- **Deploy**: multi-stage Docker on Railway; `alembic upgrade head` on entrypoint.
 
 ## Architectural rules
 
-_None yet._ These come from the constitution. After
-`/speckit-constitution`, distill the binding principles here as terse,
-testable rules (mkn10's CLAUDE.md "Architectural rules" section is the model).
+From the constitution (`.specify/memory/constitution.md` v1.0.0):
+
+- **Spec-driven, trunk-based.** No feature code without spec + plan. `main` is the
+  trunk; feature branches `NNN-name` auto-deploy on merge.
+- **Private by default.** No public/unauthenticated data endpoints. Magic-link
+  auth, roster-gated, no account enumeration. All data is members-only.
+- **Self-service ownership.** Members edit only their own profile/trips; enforce
+  ownership server-side on every mutating endpoint.
+- **Pure core, thin edges.** Overlap detection + place normalization are pure,
+  DB-free, unit-tested. I/O lives in runners/services/clients. `logging`, never
+  `print()`, in library code.
+- **Provider-swappable integrations.** Notifier (email now, WhatsApp later),
+  geocoder, object storage each sit behind a small interface; no provider details
+  in domain/call-site code.
+- **Test discipline.** Pure logic = unit tests (no DB). Integration =
+  `@pytest.mark.smoke` on live Postgres, never mock the DB. ruff + pre-commit gate
+  every commit.
+- **Migrations only.** Schema changes via alembic; no manual DDL. uv only.
 
 ## Don't
 
-- Don't pick a stack or add framework deps before the constitution records the
-  decision.
 - Don't bypass the Spec Kit workflow for non-trivial features — spec first.
+- Don't add public/unauthenticated data endpoints, or let one member edit
+  another's data.
+- Don't put I/O (DB, HTTP, storage) in the pure overlap/place logic.
+- Don't hard-wire a provider (email/geocoder/storage) into domain code — use the
+  interface.
+- Don't use `print()` in library code; don't add Poetry (uv only).
 - Don't commit secrets; `.env` is gitignored, use `.env.example` for shape.
 
 <!-- SPECKIT START -->
