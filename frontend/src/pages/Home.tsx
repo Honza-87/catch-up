@@ -1,7 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
+import * as eventsApi from "../api/events";
 import { fetchMembers } from "../api/members";
 import * as overlapsApi from "../api/overlaps";
 import * as tripsApi from "../api/trips";
@@ -13,12 +13,14 @@ export function Home() {
   const { data: members } = useQuery({ queryKey: ["members"], queryFn: fetchMembers });
   const { data: trips } = useQuery({ queryKey: ["trips", "all"], queryFn: tripsApi.listAllUpcoming });
   const { data: overlaps } = useQuery({ queryKey: ["overlaps", "me"], queryFn: overlapsApi.listMine });
+  const { data: events } = useQuery({ queryKey: ["events", "all"], queryFn: eventsApi.listAllUpcoming });
 
-  const [selectedTripId, setSelectedTripId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drawerMemberId, setDrawerMemberId] = useState<string | null>(null);
 
   const tripList = trips ?? [];
   const overlapList = overlaps ?? [];
+  const eventList = events ?? [];
 
   // Strong overlaps carry a place; highlight any pin sitting on that location.
   const overlapCoords = new Set(
@@ -44,38 +46,54 @@ export function Home() {
       label: `${t.member.display_name ?? "—"} → ${t.place.city}`,
       overlap: overlapCoords.has(`${t.place.lat},${t.place.lng}`),
     })),
+    ...eventList
+      .filter((ev) => ev.place)
+      .map((ev) => ({
+        id: ev.id,
+        lat: ev.place!.lat,
+        lng: ev.place!.lng,
+        kind: "event" as const,
+        label: `${ev.member.display_name ?? "—"}: ${ev.title}`,
+      })),
   ];
 
   function onMarkerSelect(id: string) {
     const trip = tripList.find((t) => t.id === id);
     if (trip) {
-      setSelectedTripId(id);
+      setSelectedId(id);
       setDrawerMemberId(trip.member.id);
-    } else {
-      setDrawerMemberId(id); // a home pin → that member
+      return;
     }
+    const event = eventList.find((ev) => ev.id === id);
+    if (event) {
+      setSelectedId(id);
+      setDrawerMemberId(event.member.id);
+      return;
+    }
+    setDrawerMemberId(id); // a home pin → that member
   }
 
   return (
     <div className="container home-layout">
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1 style={{ margin: 0 }}>Where's everyone?</h1>
-        <div className="row">
-          <Link to="/directory">Classmates</Link>
-          <Link to="/me">My profile</Link>
-        </div>
+      <div>
+        <h1>Where's everyone?</h1>
+        <p className="muted">
+          Homes, upcoming trips and invitations across the class — and where your paths cross.
+        </p>
       </div>
 
       <div className="home-grid">
         <div className="home-map">
-          <MapView markers={markers} selectedId={selectedTripId} onSelect={onMarkerSelect} />
+          <MapView markers={markers} selectedId={selectedId} onSelect={onMarkerSelect} />
         </div>
         <div className="home-panel">
           <TripsOverlapsPanel
             trips={tripList}
             overlaps={overlapList}
-            selectedId={selectedTripId}
-            onSelectTrip={setSelectedTripId}
+            events={eventList}
+            selectedId={selectedId}
+            onSelectTrip={setSelectedId}
+            onSelectEvent={setSelectedId}
             onOpenMember={setDrawerMemberId}
             onSelectOverlap={(o) => setDrawerMemberId(o.other_member.id)}
           />

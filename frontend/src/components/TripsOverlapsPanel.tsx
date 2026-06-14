@@ -1,17 +1,21 @@
-import type { Overlap, Trip } from "../types";
+import type { Overlap, SignificantEvent, Trip } from "../types";
 
 export function TripsOverlapsPanel({
   trips,
   overlaps,
+  events,
   selectedId,
   onSelectTrip,
+  onSelectEvent,
   onOpenMember,
   onSelectOverlap,
 }: {
   trips: Trip[];
   overlaps: Overlap[];
+  events: SignificantEvent[];
   selectedId: string | null;
   onSelectTrip: (tripId: string) => void;
+  onSelectEvent: (eventId: string) => void;
   onOpenMember: (memberId: string) => void;
   onSelectOverlap?: (overlap: Overlap) => void;
 }) {
@@ -36,6 +40,40 @@ export function TripsOverlapsPanel({
             <div className="muted">
               {o.place ? `${o.place.city}, ${o.place.country_name}` : o.country_code} · {o.kind} · {o.start_date} →{" "}
               {o.end_date}
+            </div>
+          </div>
+        ))}
+      </section>
+
+      <section>
+        <h2>Invitations</h2>
+        {events.length === 0 && <p className="muted">No upcoming events.</p>}
+        {events.map((ev) => (
+          <div
+            key={ev.id}
+            className={`card event-row ${ev.id === selectedId ? "selected" : ""}`}
+            data-testid="event-row"
+            data-selected={ev.id === selectedId}
+            style={{ cursor: "pointer", justifyContent: "space-between" }}
+            onClick={() => onSelectEvent(ev.id)}
+          >
+            <div className="row" style={{ justifyContent: "space-between" }}>
+              <strong>🎉 {ev.title}</strong>
+              <button
+                className="secondary"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onOpenMember(ev.member.id);
+                }}
+              >
+                {ev.member.display_name ?? "View"}
+              </button>
+            </div>
+            <div className="muted">
+              {ev.place ? `${ev.place.city} · ` : ""}
+              {ev.start_date}
+              {ev.end_date !== ev.start_date ? ` → ${ev.end_date}` : ""}
+              {ev.note ? ` · ${ev.note}` : ""}
             </div>
           </div>
         ))}

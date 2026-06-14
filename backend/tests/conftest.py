@@ -18,7 +18,7 @@ from sqlalchemy.orm import Session
 from catchup.db import SessionLocal, engine
 
 _BACKEND_DIR = Path(__file__).resolve().parents[1]
-_TABLES = ["overlap", "trip", "session", "signin_token", "roster_invite", "member", "place"]
+_TABLES = ["overlap", "trip", "significant_event", "session", "signin_token", "roster_invite", "member", "place"]
 
 
 @pytest.fixture(scope="session")

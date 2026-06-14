@@ -32,8 +32,10 @@ describe("TripsOverlapsPanel overlap ordering", () => {
       <TripsOverlapsPanel
         trips={[]}
         overlaps={[strong, medium]}
+        events={[]}
         selectedId={null}
         onSelectTrip={() => {}}
+        onSelectEvent={() => {}}
         onOpenMember={() => {}}
       />,
     );

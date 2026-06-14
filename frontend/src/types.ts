@@ -45,11 +45,36 @@ export interface TripUpdate {
   note?: string | null;
 }
 
+export interface SignificantEvent {
+  id: string;
+  member: MemberLite;
+  place: Place | null;
+  title: string;
+  start_date: string;
+  end_date: string;
+  note: string | null;
+}
+
+export interface EventCreate {
+  title: string;
+  start_date: string;
+  end_date: string;
+  note?: string | null;
+}
+
+export interface EventUpdate {
+  title?: string;
+  start_date?: string;
+  end_date?: string;
+  note?: string | null;
+}
+
 export interface MemberDetail extends MemberSummary {
   email: string;
   note: string | null;
   created_at: string;
   trips: Trip[];
+  events: SignificantEvent[];
 }
 
 export interface Overlap {

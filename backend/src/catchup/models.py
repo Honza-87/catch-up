@@ -126,3 +126,30 @@ class Overlap(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
     place: Mapped[Place | None] = relationship(lazy="joined")
+
+
+class SignificantEvent(Base):
+    """A member's significant event at their home — an open invitation (e.g. birthday).
+
+    Anchored to the host's `home_place` (resolved at read time); something elsewhere
+    is modelled as a trip instead. Inclusive `[start_date, end_date]` day range.
+    """
+
+    __tablename__ = "significant_event"
+
+    id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True, default=uuid4)
+    member_id: Mapped[UUID] = mapped_column(
+        PgUUID(as_uuid=True), ForeignKey("member.id", ondelete="CASCADE"), nullable=False, index=True
+    )
+    title: Mapped[str] = mapped_column(Text, nullable=False)
+    start_date: Mapped[date] = mapped_column(Date, nullable=False)
+    end_date: Mapped[date] = mapped_column(Date, nullable=False)
+    note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+    member: Mapped[Member] = relationship(lazy="joined")
+
+    @property
+    def place(self) -> Place | None:
+        """The host's home location (events are anchored to home), resolved at read time."""
+        return self.member.home_place

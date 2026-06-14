@@ -4,10 +4,10 @@ import { useEffect } from "react";
 import { MapContainer, Marker, TileLayer, Tooltip, useMap } from "react-leaflet";
 
 export interface MapMarker {
-  id: string; // selection id (member id for homes, trip id for trips)
+  id: string; // selection id (member id for homes, trip/event id otherwise)
   lat: number;
   lng: number;
-  kind: "home" | "trip";
+  kind: "home" | "trip" | "event";
   label: string;
   overlap?: boolean; // highlight as an overlap location (US3)
 }
