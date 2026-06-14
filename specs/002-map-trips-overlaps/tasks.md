@@ -26,8 +26,8 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 **Purpose**: Dependencies + entrypoints needed before feature work.
 
-- [ ] T001 [P] Add `leaflet`, `react-leaflet`, and `@types/leaflet` to `frontend/package.json` and install (map stack, OSM tiles, no API key)
-- [ ] T002 [P] Add `catchup-overlap = "catchup.overlaps.worker:main"` under `[project.scripts]` in `backend/pyproject.toml` (scheduled-worker console entry)
+- [X] T001 [P] Add `leaflet`, `react-leaflet`, and `@types/leaflet` to `frontend/package.json` and install (map stack, OSM tiles, no API key)
+- [X] T002 [P] Add `catchup-overlap = "catchup.overlaps.worker:main"` under `[project.scripts]` in `backend/pyproject.toml` (scheduled-worker console entry)
 
 ---
 
@@ -37,9 +37,9 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 **⚠️ CRITICAL**: No user story work begins until this phase is complete.
 
-- [ ] T003 Add `Trip` and `Overlap` SQLAlchemy models to `backend/src/catchup/models.py` per data-model.md (Trip: member_id FK CASCADE, place_id FK, start_date/end_date Date, note, created_at; Overlap: member_a_id<member_b_id, kind, strength, place_id nullable FK, country_code, scope_key, start/end_date, notified_at, created_at)
-- [ ] T004 Create migration `backend/alembic/versions/0002_trips_overlaps.py` creating `trip` + `overlap` tables with `UNIQUE (member_a_id, member_b_id, kind, scope_key)`, indexes on `trip.member_id`, `overlap.member_a_id`, `overlap.member_b_id`, and member-delete cascade (depends on T003; downgrade drops both)
-- [ ] T005 Create `backend/src/catchup/places/service.py` and move `_upsert_place` there from `backend/src/catchup/members/service.py`; update `members/service.py` to import it (single source of place dedup, shared by members + trips)
+- [X] T003 Add `Trip` and `Overlap` SQLAlchemy models to `backend/src/catchup/models.py` per data-model.md (Trip: member_id FK CASCADE, place_id FK, start_date/end_date Date, note, created_at; Overlap: member_a_id<member_b_id, kind, strength, place_id nullable FK, country_code, scope_key, start/end_date, notified_at, created_at)
+- [X] T004 Create migration `backend/alembic/versions/0002_trips_overlaps.py` creating `trip` + `overlap` tables with `UNIQUE (member_a_id, member_b_id, kind, scope_key)`, indexes on `trip.member_id`, `overlap.member_a_id`, `overlap.member_b_id`, and member-delete cascade (depends on T003; downgrade drops both)
+- [X] T005 Create `backend/src/catchup/places/service.py` and move `_upsert_place` there from `backend/src/catchup/members/service.py`; update `members/service.py` to import it (single source of place dedup, shared by members + trips)
 
 **Checkpoint**: Schema + shared place service ready — user stories can begin.
 
@@ -53,21 +53,21 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 ### Tests (write first, must fail)
 
-- [ ] T006 [P] [US1] Unit test trip date-range validation (end ≥ start; equal allowed) in `backend/tests/test_trip_validation.py`
-- [ ] T007 [P] [US1] Smoke test trip CRUD + ownership (create/edit/delete own; 403 other member's trip; 422 inverted dates; place dedup; 401 when unauthenticated on `POST/PATCH/DELETE /trips` and `GET /trips/me`) in `backend/tests/test_trips_smoke.py`
+- [X] T006 [P] [US1] Unit test trip date-range validation (end ≥ start; equal allowed) in `backend/tests/test_trip_validation.py`
+- [X] T007 [P] [US1] Smoke test trip CRUD + ownership (create/edit/delete own; 403 other member's trip; 422 inverted dates; place dedup; 401 when unauthenticated on `POST/PATCH/DELETE /trips` and `GET /trips/me`) in `backend/tests/test_trips_smoke.py`
 
 ### Implementation
 
-- [ ] T008 [P] [US1] Pure date-range validation (`validate_trip_dates`) in `backend/src/catchup/trips/validation.py` (+ `backend/src/catchup/trips/__init__.py`)
-- [ ] T009 [P] [US1] Add `TripSchema`, `TripCreate`, `TripUpdate` (partial via `model_fields_set`) to `backend/src/catchup/api/schemas.py`
-- [ ] T010 [US1] Implement trip service — own-trip create/edit/delete, ownership guard (raise `forbidden` 403 when `member_id` ≠ caller), place upsert via `places.service` — in `backend/src/catchup/trips/service.py` (depends on T005, T008)
-- [ ] T011 [US1] Implement trips router `GET /trips/me`, `POST /trips`, `PATCH /trips/{id}`, `DELETE /trips/{id}` (all `Depends(get_current_member)`) in `backend/src/catchup/api/trips.py` (depends on T009, T010)
-- [ ] T012 [US1] Register trips router in `_register_routers` in `backend/src/catchup/app.py`
-- [ ] T013 [P] [US1] Add `Trip` type to `frontend/src/types.ts`
-- [ ] T014 [P] [US1] Add trip API hooks (`listMine`, `create`, `update`, `delete`) in `frontend/src/api/trips.ts`
-- [ ] T015 [US1] Build `TripForm` (destination via existing `PlaceAutocomplete`, start/end dates, note, client date validation) in `frontend/src/components/TripForm.tsx` (depends on T013, T014)
-- [ ] T016 [US1] Add "My trips" management (list own upcoming trips + add/edit/delete via `TripForm`) to `frontend/src/pages/Profile.tsx` (depends on T015)
-- [ ] T017 [P] [US1] Frontend test for `TripForm` (valid submit; inverted-date error shown; manual city/country entry saves a trip when destination lookup returns no results — FR-007) in `frontend/tests/TripForm.test.tsx`
+- [X] T008 [P] [US1] Pure date-range validation (`validate_trip_dates`) in `backend/src/catchup/trips/validation.py` (+ `backend/src/catchup/trips/__init__.py`)
+- [X] T009 [P] [US1] Add `TripSchema`, `TripCreate`, `TripUpdate` (partial via `model_fields_set`) to `backend/src/catchup/api/schemas.py`
+- [X] T010 [US1] Implement trip service — own-trip create/edit/delete, ownership guard (raise `forbidden` 403 when `member_id` ≠ caller), place upsert via `places.service` — in `backend/src/catchup/trips/service.py` (depends on T005, T008)
+- [X] T011 [US1] Implement trips router `GET /trips/me`, `POST /trips`, `PATCH /trips/{id}`, `DELETE /trips/{id}` (all `Depends(get_current_member)`) in `backend/src/catchup/api/trips.py` (depends on T009, T010)
+- [X] T012 [US1] Register trips router in `_register_routers` in `backend/src/catchup/app.py`
+- [X] T013 [P] [US1] Add `Trip` type to `frontend/src/types.ts`
+- [X] T014 [P] [US1] Add trip API hooks (`listMine`, `create`, `update`, `delete`) in `frontend/src/api/trips.ts`
+- [X] T015 [US1] Build `TripForm` (destination via existing `PlaceAutocomplete`, start/end dates, note, client date validation) in `frontend/src/components/TripForm.tsx` (depends on T013, T014)
+- [X] T016 [US1] Add "My trips" management (list own upcoming trips + add/edit/delete via `TripForm`) to `frontend/src/pages/Profile.tsx` (depends on T015)
+- [X] T017 [P] [US1] Frontend test for `TripForm` (valid submit; inverted-date error shown; manual city/country entry saves a trip when destination lookup returns no results — FR-007) in `frontend/tests/TripForm.test.tsx`
 
 **Checkpoint**: US1 fully functional — members manage their own trips. MVP demoable.
 
@@ -81,19 +81,19 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 ### Tests (write first, must fail)
 
-- [ ] T018 [P] [US2] Smoke test `GET /trips` (all upcoming, excludes past `end_date < today`, sorted), 401 when unauthenticated on `GET /trips`, and `MemberDetail` embeds upcoming `trips` in `backend/tests/test_map_smoke.py`
+- [X] T018 [P] [US2] Smoke test `GET /trips` (all upcoming, excludes past `end_date < today`, sorted), 401 when unauthenticated on `GET /trips`, and `MemberDetail` embeds upcoming `trips` in `backend/tests/test_map_smoke.py`
 
 ### Implementation
 
-- [ ] T019 [US2] Add `GET /trips` (all members' upcoming trips, member+place embedded, sorted by start_date) to `backend/src/catchup/api/trips.py` (depends on T011)
-- [ ] T020 [US2] Embed upcoming trips in member detail — add `trips: list[TripSchema]` to `MemberDetail` in `backend/src/catchup/api/schemas.py` and load them in `get_member` in `backend/src/catchup/members/service.py`
-- [ ] T021 [P] [US2] Add `listAllUpcoming` trip hook in `frontend/src/api/trips.ts`
-- [ ] T022 [P] [US2] `MapView` (react-leaflet + OSM tiles; distinct home/trip/overlap markers; fit-to-bounds; exposes selected-id ↔ highlight) in `frontend/src/components/MapView.tsx`
-- [ ] T023 [P] [US2] `TripsOverlapsPanel` (overlaps section pinned above upcoming-trips list; selectable rows emit selection) in `frontend/src/components/TripsOverlapsPanel.tsx`
-- [ ] T024 [P] [US2] `MemberDrawer` (classmate profile + trips + `wa.me` button, reusing `WhatsAppButton`) in `frontend/src/components/MemberDrawer.tsx`
-- [ ] T025 [US2] `Home` page composing `MapView` + `TripsOverlapsPanel` with two-way selection linking (tap trip ↔ highlight pin; tap pin → scroll/open drawer), querying `GET /members` + `GET /trips` in `frontend/src/pages/Home.tsx` (depends on T021, T022, T023, T024)
-- [ ] T026 [US2] Make `Home` the landing route + update nav in `frontend/src/App.tsx` (depends on T025)
-- [ ] T027 [P] [US2] Frontend test panel↔map linking (select trip → marker highlighted) in `frontend/tests/HomeLinking.test.tsx`
+- [X] T019 [US2] Add `GET /trips` (all members' upcoming trips, member+place embedded, sorted by start_date) to `backend/src/catchup/api/trips.py` (depends on T011)
+- [X] T020 [US2] Embed upcoming trips in member detail — add `trips: list[TripSchema]` to `MemberDetail` in `backend/src/catchup/api/schemas.py` and load them in `get_member` in `backend/src/catchup/members/service.py`
+- [X] T021 [P] [US2] Add `listAllUpcoming` trip hook in `frontend/src/api/trips.ts`
+- [X] T022 [P] [US2] `MapView` (react-leaflet + OSM tiles; distinct home/trip/overlap markers; fit-to-bounds; exposes selected-id ↔ highlight) in `frontend/src/components/MapView.tsx`
+- [X] T023 [P] [US2] `TripsOverlapsPanel` (overlaps section pinned above upcoming-trips list; selectable rows emit selection) in `frontend/src/components/TripsOverlapsPanel.tsx`
+- [X] T024 [P] [US2] `MemberDrawer` (classmate profile + trips + `wa.me` button, reusing `WhatsAppButton`) in `frontend/src/components/MemberDrawer.tsx`
+- [X] T025 [US2] `Home` page composing `MapView` + `TripsOverlapsPanel` with two-way selection linking (tap trip ↔ highlight pin; tap pin → scroll/open drawer), querying `GET /members` + `GET /trips` in `frontend/src/pages/Home.tsx` (depends on T021, T022, T023, T024)
+- [X] T026 [US2] Make `Home` the landing route + update nav in `frontend/src/App.tsx` (depends on T025)
+- [X] T027 [P] [US2] Frontend test panel↔map linking (select trip → marker highlighted) in `frontend/tests/HomeLinking.test.tsx`
 
 **Checkpoint**: US1 + US2 work independently. Overlaps section renders (empty until US3).
 
@@ -107,19 +107,19 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 ### Tests (write first, must fail)
 
-- [ ] T028 [P] [US3] Table-driven unit tests for the pure engine in `backend/tests/test_overlap_detection.py`: same/diff city, same/diff country, trip↔trip, trip↔home (strong + medium), date intersect/disjoint, home suppression + resident-away, home↔home excluded, self excluded, unordered-pair canonicalization, strongest-first ordering
-- [ ] T029 [P] [US3] Smoke test runner reconcile in `backend/tests/test_overlap_runner_smoke.py`: inserts new overlaps, deletes vanished ones, updates dates on a still-matching overlap (rows keyed by `(a,b,kind,scope_key)`); plus `GET /overlaps/me` returns the caller's overlaps strong-first and 401 when unauthenticated
+- [X] T028 [P] [US3] Table-driven unit tests for the pure engine in `backend/tests/test_overlap_detection.py`: same/diff city, same/diff country, trip↔trip, trip↔home (strong + medium), date intersect/disjoint, home suppression + resident-away, home↔home excluded, self excluded, unordered-pair canonicalization, strongest-first ordering
+- [X] T029 [P] [US3] Smoke test runner reconcile in `backend/tests/test_overlap_runner_smoke.py`: inserts new overlaps, deletes vanished ones, updates dates on a still-matching overlap (rows keyed by `(a,b,kind,scope_key)`); plus `GET /overlaps/me` returns the caller's overlaps strong-first and 401 when unauthenticated
 
 ### Implementation
 
-- [ ] T030 [P] [US3] Pure overlap engine + value objects (`Presence`, `DetectedOverlap`, `detect_overlaps(presences, today)`) — interval intersection, home = window minus resident's own trips, scope_key derivation, NO db/io — in `backend/src/catchup/overlaps/detection.py` (+ `backend/src/catchup/overlaps/__init__.py`)
-- [ ] T031 [US3] Overlap runner reconcile — load homes + upcoming trips, build presences, call `detect_overlaps`, upsert/delete `overlap` rows by `scope_key` identity (keep `notified_at` on date-shift) — in `backend/src/catchup/overlaps/runner.py` (depends on T030)
-- [ ] T032 [US3] Worker entrypoint `catchup-overlap` (typer `main` → run reconcile pass, then exit) in `backend/src/catchup/overlaps/worker.py` (depends on T031, T002)
-- [ ] T033 [P] [US3] Add `OverlapSchema` (other_member resolved, place nullable for medium) to `backend/src/catchup/api/schemas.py`
-- [ ] T034 [US3] Overlaps router `GET /overlaps/me` (strong-first, then start_date; resolves the non-caller member) in `backend/src/catchup/api/overlaps.py` and register it in `backend/src/catchup/app.py` (depends on T033)
-- [ ] T035 [P] [US3] Add `Overlap` type + overlaps API hook (`listMine`) in `frontend/src/types.ts` and `frontend/src/api/overlaps.ts`
-- [ ] T036 [US3] Wire overlaps into `TripsOverlapsPanel` (strong-first list) and overlap-place highlights on `MapView`, querying `GET /overlaps/me` from `Home` in `frontend/src/components/TripsOverlapsPanel.tsx` + `frontend/src/components/MapView.tsx` (depends on T022, T023, T035)
-- [ ] T037 [P] [US3] Frontend test overlap list ordering (strong before medium) in `frontend/tests/OverlapList.test.tsx`
+- [X] T030 [P] [US3] Pure overlap engine + value objects (`Presence`, `DetectedOverlap`, `detect_overlaps(presences, today)`) — interval intersection, home = window minus resident's own trips, scope_key derivation, NO db/io — in `backend/src/catchup/overlaps/detection.py` (+ `backend/src/catchup/overlaps/__init__.py`)
+- [X] T031 [US3] Overlap runner reconcile — load homes + upcoming trips, build presences, call `detect_overlaps`, upsert/delete `overlap` rows by `scope_key` identity (keep `notified_at` on date-shift) — in `backend/src/catchup/overlaps/runner.py` (depends on T030)
+- [X] T032 [US3] Worker entrypoint `catchup-overlap` (typer `main` → run reconcile pass, then exit) in `backend/src/catchup/overlaps/worker.py` (depends on T031, T002)
+- [X] T033 [P] [US3] Add `OverlapSchema` (other_member resolved, place nullable for medium) to `backend/src/catchup/api/schemas.py`
+- [X] T034 [US3] Overlaps router `GET /overlaps/me` (strong-first, then start_date; resolves the non-caller member) in `backend/src/catchup/api/overlaps.py` and register it in `backend/src/catchup/app.py` (depends on T033)
+- [X] T035 [P] [US3] Add `Overlap` type + overlaps API hook (`listMine`) in `frontend/src/types.ts` and `frontend/src/api/overlaps.ts`
+- [X] T036 [US3] Wire overlaps into `TripsOverlapsPanel` (strong-first list) and overlap-place highlights on `MapView`, querying `GET /overlaps/me` from `Home` in `frontend/src/components/TripsOverlapsPanel.tsx` + `frontend/src/components/MapView.tsx` (depends on T022, T023, T035)
+- [X] T037 [P] [US3] Frontend test overlap list ordering (strong before medium) in `frontend/tests/OverlapList.test.tsx`
 
 **Checkpoint**: All three in-app stories functional. Overlaps visible and graded; recompute runs via the worker.
 
@@ -133,15 +133,15 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 ### Tests (write first, must fail)
 
-- [ ] T038 [P] [US4] Smoke test runner notify in `backend/tests/test_overlap_notify_smoke.py`: one digest per member per run, no re-alert on rerun (notified_at stamped), failed send leaves `notified_at` NULL for retry, reappearance re-alerts (overlap removed → recompute deletes it → same-identity overlap re-added → fresh digest) — uses a stub Notifier capturing/raising
+- [X] T038 [P] [US4] Smoke test runner notify in `backend/tests/test_overlap_notify_smoke.py`: one digest per member per run, no re-alert on rerun (notified_at stamped), failed send leaves `notified_at` NULL for retry, reappearance re-alerts (overlap removed → recompute deletes it → same-identity overlap re-added → fresh digest) — uses a stub Notifier capturing/raising
 
 ### Implementation
 
-- [ ] T039 [P] [US4] Extend `Notifier` protocol with `send_overlap_digest(email, member_name, overlaps)` + `OverlapDigestItem` dataclass in `backend/src/catchup/notify/base.py`
-- [ ] T040 [P] [US4] Implement `send_overlap_digest` in `ConsoleNotifier` (logs the digest) in `backend/src/catchup/notify/console.py`
-- [ ] T041 [P] [US4] Implement `send_overlap_digest` in `ResendNotifier` (render text/HTML digest, send) in `backend/src/catchup/notify/email_resend.py`
-- [ ] T042 [US4] Add notify step to runner — group `notified_at IS NULL` rows by member, send one digest per member via `get_notifier()`, stamp `notified_at` only after a member's send succeeds, leave NULL on failure; call it after reconcile in the worker — in `backend/src/catchup/overlaps/runner.py` (depends on T031, T039, T040, T041)
-- [ ] T043 [US4] Add a Railway scheduled (cron) service running `catchup-overlap` hourly (`0 * * * *`) sharing the API image + `DATABASE_URL`/notifier env in `backend/railway.json`; document provisioning in `specs/002-map-trips-overlaps/quickstart.md` (depends on T032, T042)
+- [X] T039 [P] [US4] Extend `Notifier` protocol with `send_overlap_digest(email, member_name, overlaps)` + `OverlapDigestItem` dataclass in `backend/src/catchup/notify/base.py`
+- [X] T040 [P] [US4] Implement `send_overlap_digest` in `ConsoleNotifier` (logs the digest) in `backend/src/catchup/notify/console.py`
+- [X] T041 [P] [US4] Implement `send_overlap_digest` in `ResendNotifier` (render text/HTML digest, send) in `backend/src/catchup/notify/email_resend.py`
+- [X] T042 [US4] Add notify step to runner — group `notified_at IS NULL` rows by member, send one digest per member via `get_notifier()`, stamp `notified_at` only after a member's send succeeds, leave NULL on failure; call it after reconcile in the worker — in `backend/src/catchup/overlaps/runner.py` (depends on T031, T039, T040, T041)
+- [X] T043 [US4] Add a Railway scheduled (cron) service running `catchup-overlap` hourly (`0 * * * *`) sharing the API image + `DATABASE_URL`/notifier env in `backend/railway.json`; document provisioning in `specs/002-map-trips-overlaps/quickstart.md` (depends on T032, T042)
 
 **Checkpoint**: Full feature — members are proactively alerted to new overlaps.
 
@@ -149,10 +149,10 @@ Web app: backend at `backend/src/catchup/`, backend tests at `backend/tests/`, f
 
 ## Phase 7: Polish & Cross-Cutting Concerns
 
-- [ ] T044 [P] Update `backend/README.md` (trips/overlaps modules, worker, `catchup-overlap`) and frontend usage notes
-- [ ] T045 [P] Mobile: render `TripsOverlapsPanel` as a swipe-up bottom sheet on small screens (desktop side panel unchanged) in `frontend/src/components/TripsOverlapsPanel.tsx`
-- [ ] T046 Run full gates: `uv run pytest -m "not smoke"`, `uv run pytest -m smoke`, `uv run ruff check . && uv run ruff format --check .`, `npm test`; fix failures
-- [ ] T047 Run `specs/002-map-trips-overlaps/quickstart.md` end-to-end (incl. DB-port remap + worker dev loop)
+- [X] T044 [P] Update `backend/README.md` (trips/overlaps modules, worker, `catchup-overlap`) and frontend usage notes
+- [X] T045 [P] Mobile: render `TripsOverlapsPanel` as a swipe-up bottom sheet on small screens (desktop side panel unchanged) in `frontend/src/components/TripsOverlapsPanel.tsx`
+- [X] T046 Run full gates: `uv run pytest -m "not smoke"`, `uv run pytest -m smoke`, `uv run ruff check . && uv run ruff format --check .`, `npm test`; fix failures
+- [X] T047 Run `specs/002-map-trips-overlaps/quickstart.md` end-to-end (incl. DB-port remap + worker dev loop)
 
 ---
 
