@@ -13,9 +13,21 @@
 # Logs
 *.log
 
-# --- Stack-specific (add once the stack is chosen; see CLAUDE.md "Tooling") ---
-# Python:  .venv/  __pycache__/  *.pyc  .pytest_cache/  .ruff_cache/  .coverage
-# Node:    node_modules/  dist/  build/
+# Python (backend)
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Node (frontend)
+node_modules/
+dist/
+build/
+*.tsbuildinfo
 
 # Brainstorm visual companion
 .superpowers/
