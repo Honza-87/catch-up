@@ -80,20 +80,20 @@ WhatsApp, note, photo) with ownership enforcement.
 
 ### Tests for User Story 2
 
-- [ ] T026 [P] [US2] Unit tests for validation (WhatsApp E.164, image type/size) in `backend/tests/test_validation.py`
-- [ ] T027 [P] [US2] Unit tests for geocoder→Place parsing in `backend/tests/test_place_parse.py`
-- [ ] T028 [P] [US2] Smoke test profile edit + photo upload + ownership refusal in `backend/tests/test_members_smoke.py`
+- [X] T026 [P] [US2] Unit tests for validation (WhatsApp E.164, image type/size) in `backend/tests/test_validation.py`
+- [X] T027 [P] [US2] Unit tests for geocoder→Place parsing in `backend/tests/test_place_parse.py`
+- [X] T028 [P] [US2] Smoke test profile edit + photo upload + ownership refusal in `backend/tests/test_members_smoke.py`
 
 ### Implementation for User Story 2
 
-- [ ] T029 [P] [US2] PURE validation (WhatsApp E.164 via phonenumbers; image type/size) in `backend/src/catchup/members/validation.py`
-- [ ] T030 [P] [US2] PURE geocoder response → Place in `backend/src/catchup/places/parse.py`
-- [ ] T031 [US2] Places service + `GET /places/search` proxy (Photon) with place dedupe/upsert in `backend/src/catchup/api/places.py` (depends T013, T030, T010)
-- [ ] T032 [US2] Members service: read/update own profile + home-place upsert (ownership-checked) in `backend/src/catchup/members/service.py` (depends T010, T029)
-- [ ] T033 [US2] `PATCH /members/me` router in `backend/src/catchup/api/members.py` (depends T032, T016)
-- [ ] T034 [US2] Photo endpoints `POST`/`DELETE /members/me/photo` (validate + PhotoStore, set/clear photo_url) in `backend/src/catchup/api/members.py` (depends T014, T029, T032)
-- [ ] T035 [US2] Register members + places routers in `backend/src/catchup/app.py` (depends T033, T031)
-- [ ] T036 [P] [US2] Frontend Profile edit page + `PhotoUpload` + `PlaceAutocomplete` in `frontend/src/pages/Profile.tsx`, `frontend/src/components/`
+- [X] T029 [P] [US2] PURE validation (WhatsApp E.164 via phonenumbers; image type/size) in `backend/src/catchup/members/validation.py`
+- [X] T030 [P] [US2] PURE geocoder response → Place in `backend/src/catchup/places/parse.py`
+- [X] T031 [US2] Places service + `GET /places/search` proxy (Photon) with place dedupe/upsert in `backend/src/catchup/api/places.py` (depends T013, T030, T010)
+- [X] T032 [US2] Members service: read/update own profile + home-place upsert (ownership-checked) in `backend/src/catchup/members/service.py` (depends T010, T029)
+- [X] T033 [US2] `PATCH /members/me` router in `backend/src/catchup/api/members.py` (depends T032, T016)
+- [X] T034 [US2] Photo endpoints `POST`/`DELETE /members/me/photo` (validate + PhotoStore, set/clear photo_url) in `backend/src/catchup/api/members.py` (depends T014, T029, T032)
+- [X] T035 [US2] Register members + places routers in `backend/src/catchup/app.py` (depends T033, T031)
+- [X] T036 [P] [US2] Frontend Profile edit page + `PhotoUpload` + `PlaceAutocomplete` in `frontend/src/pages/Profile.tsx`, `frontend/src/components/`
 
 **Checkpoint**: US1 + US2 work — members can get in and curate their profile.
 
