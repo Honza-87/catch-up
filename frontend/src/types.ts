@@ -6,6 +6,12 @@ export interface Place {
   lng: number;
 }
 
+export interface MemberLite {
+  id: string;
+  display_name: string | null;
+  photo_url: string | null;
+}
+
 export interface MemberSummary {
   id: string;
   display_name: string | null;
@@ -16,10 +22,45 @@ export interface MemberSummary {
   whatsapp_e164: string | null;
 }
 
+export interface Trip {
+  id: string;
+  member: MemberLite;
+  place: Place;
+  start_date: string;
+  end_date: string;
+  note: string | null;
+}
+
+export interface TripCreate {
+  place: Place;
+  start_date: string;
+  end_date: string;
+  note?: string | null;
+}
+
+export interface TripUpdate {
+  place?: Place;
+  start_date?: string;
+  end_date?: string;
+  note?: string | null;
+}
+
 export interface MemberDetail extends MemberSummary {
   email: string;
   note: string | null;
   created_at: string;
+  trips: Trip[];
+}
+
+export interface Overlap {
+  id: string;
+  other_member: MemberLite;
+  kind: "trip-trip" | "trip-home";
+  strength: "strong" | "medium";
+  place: Place | null;
+  country_code: string;
+  start_date: string;
+  end_date: string;
 }
 
 export interface ProfileUpdate {

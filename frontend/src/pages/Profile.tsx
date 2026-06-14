@@ -1,12 +1,14 @@
-import { useQueryClient } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { Link } from "react-router-dom";
 
 import { logout, useMe } from "../api/auth";
 import { updateProfile } from "../api/members";
+import * as tripsApi from "../api/trips";
 import { PhotoUpload } from "../components/PhotoUpload";
 import { PlaceAutocomplete } from "../components/PlaceAutocomplete";
-import type { Place } from "../types";
+import { TripForm, type TripFormValues } from "../components/TripForm";
+import type { Place, Trip } from "../types";
 
 export function Profile() {
   const { data: me, isLoading } = useMe();
@@ -98,6 +100,77 @@ export function Profile() {
           <button type="submit">Save</button> {saved && <span className="muted">Saved ✓</span>}
         </p>
       </form>
+
+      <MyTrips />
     </div>
+  );
+}
+
+function MyTrips() {
+  const queryClient = useQueryClient();
+  const { data: trips, isLoading } = useQuery({ queryKey: ["trips", "me"], queryFn: tripsApi.listMine });
+  const [adding, setAdding] = useState(false);
+  const [editing, setEditing] = useState<Trip | null>(null);
+
+  async function refresh() {
+    await queryClient.invalidateQueries({ queryKey: ["trips"] });
+  }
+
+  async function save(values: TripFormValues) {
+    if (editing) await tripsApi.update(editing.id, values);
+    else await tripsApi.create(values);
+    setEditing(null);
+    setAdding(false);
+    await refresh();
+  }
+
+  async function remove(id: string) {
+    await tripsApi.remove(id);
+    await refresh();
+  }
+
+  return (
+    <section>
+      <div className="row" style={{ justifyContent: "space-between", marginTop: "1.5rem" }}>
+        <h2 style={{ margin: 0 }}>My trips</h2>
+        {!adding && !editing && <button onClick={() => setAdding(true)}>Add trip</button>}
+      </div>
+
+      {(adding || editing) && (
+        <TripForm
+          trip={editing}
+          onSubmit={save}
+          onCancel={() => {
+            setAdding(false);
+            setEditing(null);
+          }}
+        />
+      )}
+
+      {isLoading && <p className="muted">Loading…</p>}
+      {trips?.length === 0 && !adding && <p className="muted">No trips yet.</p>}
+
+      {trips?.map((t) => (
+        <div key={t.id} className="card row" style={{ justifyContent: "space-between" }}>
+          <div>
+            <div style={{ fontWeight: 600 }}>
+              📍 {t.place.city}, {t.place.country_name}
+            </div>
+            <div className="muted">
+              {t.start_date} → {t.end_date}
+              {t.note ? ` · ${t.note}` : ""}
+            </div>
+          </div>
+          <div className="row">
+            <button className="secondary" onClick={() => setEditing(t)}>
+              Edit
+            </button>
+            <button className="secondary" onClick={() => remove(t.id)}>
+              Delete
+            </button>
+          </div>
+        </div>
+      ))}
+    </section>
   );
 }

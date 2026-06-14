@@ -13,11 +13,13 @@ from catchup.logging_config import configure_logging
 
 def _register_routers(app: FastAPI) -> None:
     """Attach feature routers. Imported lazily so the factory stays cohesive."""
-    from catchup.api import auth, members, places
+    from catchup.api import auth, members, overlaps, places, trips
 
     app.include_router(auth.router)
     app.include_router(members.router)
     app.include_router(places.router)
+    app.include_router(trips.router)
+    app.include_router(overlaps.router)
 
 
 def create_app() -> FastAPI:
