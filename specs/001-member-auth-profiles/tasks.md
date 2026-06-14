@@ -18,15 +18,15 @@ independent implementation and testing.
 
 ## Phase 1: Setup (Shared Infrastructure)
 
-- [ ] T001 Create monorepo structure (`backend/`, `frontend/`) per plan.md
-- [ ] T002 [P] Initialize backend uv project in `backend/pyproject.toml` (name `catchup`, py3.13; deps fastapi, sqlalchemy, alembic, psycopg[binary], pydantic-settings, itsdangerous, boto3, httpx, phonenumbers, pillow, typer; dev: pytest, pytest-cov, ruff, pre-commit; `[project.scripts] catchup-roster`; ruff line-length 120 + `E/W/F/I/B/UP/SIM`; pytest `--strict-markers` + `smoke` marker)
-- [ ] T003 [P] Initialize frontend Vite+TS project in `frontend/package.json` (react, react-dom, react-router-dom, @tanstack/react-query; dev: vite, typescript, vitest, @testing-library/react, jsdom)
-- [ ] T004 [P] Add `ruff` + `ruff-format` hooks to `.pre-commit-config.yaml`
-- [ ] T005 [P] Create `backend/docker-compose.dev.yml` (Postgres + MinIO)
-- [ ] T006 [P] Create `backend/.env.example` with all env vars from quickstart.md
-- [ ] T007 [P] Implement settings in `backend/src/catchup/config.py` (pydantic-settings: DATABASE_URL, SESSION_SECRET, NOTIFIER, RESEND_API_KEY, GEOCODER_URL, S3_*, MAGIC_LINK_TTL_MINUTES, cookie flags)
-- [ ] T008 [P] Implement `backend/src/catchup/db.py` (engine + SessionLocal + `session_scope`)
-- [ ] T009 [P] Configure stdlib logging via `LOG_LEVEL` in `backend/src/catchup/logging_config.py`
+- [X] T001 Create monorepo structure (`backend/`, `frontend/`) per plan.md
+- [X] T002 [P] Initialize backend uv project in `backend/pyproject.toml` (name `catchup`, py3.13; deps fastapi, sqlalchemy, alembic, psycopg[binary], pydantic-settings, itsdangerous, boto3, httpx, phonenumbers, pillow, typer; dev: pytest, pytest-cov, ruff, pre-commit; `[project.scripts] catchup-roster`; ruff line-length 120 + `E/W/F/I/B/UP/SIM`; pytest `--strict-markers` + `smoke` marker)
+- [X] T003 [P] Initialize frontend Vite+TS project in `frontend/package.json` (react, react-dom, react-router-dom, @tanstack/react-query; dev: vite, typescript, vitest, @testing-library/react, jsdom)
+- [X] T004 [P] Add `ruff` + `ruff-format` hooks to `.pre-commit-config.yaml`
+- [X] T005 [P] Create `backend/docker-compose.dev.yml` (Postgres + MinIO)
+- [X] T006 [P] Create `backend/.env.example` with all env vars from quickstart.md
+- [X] T007 [P] Implement settings in `backend/src/catchup/config.py` (pydantic-settings: DATABASE_URL, SESSION_SECRET, NOTIFIER, RESEND_API_KEY, GEOCODER_URL, S3_*, MAGIC_LINK_TTL_MINUTES, cookie flags)
+- [X] T008 [P] Implement `backend/src/catchup/db.py` (engine + SessionLocal + `session_scope`)
+- [X] T009 [P] Configure stdlib logging via `LOG_LEVEL` in `backend/src/catchup/logging_config.py`
 
 ---
 

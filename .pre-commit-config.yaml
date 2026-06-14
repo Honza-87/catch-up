@@ -1,5 +1,4 @@
-# Hygiene hooks only — stack-agnostic. Add ruff (or the stack's lint/format)
-# once the language is chosen; see CLAUDE.md "Tooling".
+# Hygiene hooks (all files) + ruff lint/format scoped to the Python backend.
 repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v5.0.0
@@ -9,3 +8,12 @@ repos:
       - id: check-yaml
       - id: check-added-large-files
       - id: check-merge-conflict
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^backend/
+      - id: ruff-format
+        files: ^backend/

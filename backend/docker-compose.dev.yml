@@ -1,0 +1,41 @@
+# Local dev backing services for catch-up: Postgres + MinIO (S3-compatible).
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_USER: catchup
+      POSTGRES_PASSWORD: catchup
+      POSTGRES_DB: catchup
+    ports:
+      - "5432:5432"
+    volumes:
+      - catchup_pgdata:/var/lib/postgresql/data
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+    ports:
+      - "9000:9000"   # S3 API
+      - "9001:9001"   # web console
+    volumes:
+      - catchup_miniodata:/data
+
+  # One-shot: create the photos bucket and make it publicly readable.
+  minio-setup:
+    image: minio/mc
+    depends_on:
+      - minio
+    entrypoint: >
+      /bin/sh -c "
+      until mc alias set local http://minio:9000 minioadmin minioadmin; do sleep 1; done;
+      mc mb -p local/catchup-photos;
+      mc anonymous set download local/catchup-photos;
+      exit 0;
+      "
+
+volumes:
+  catchup_pgdata:
+  catchup_miniodata:
