@@ -121,13 +121,13 @@ profile → all shared fields visible, WhatsApp opens `wa.me`.
 
 ## Phase 6: Polish & Cross-Cutting
 
-- [ ] T041 [P] Multi-stage `backend/Dockerfile` + `backend/scripts/entrypoint.sh` (`alembic upgrade head` before serving)
-- [ ] T042 [P] Railway config `railway.json` (api + web services, Postgres, object-storage bucket)
-- [ ] T043 [P] Frontend production build config + static-serve notes in `frontend/`
-- [ ] T044 Run `quickstart.md` end-to-end and fix gaps
-- [ ] T045 [P] Ensure `ruff check`, `ruff format --check`, `pytest`, `vitest` all green; document `pre-commit install`
-- [ ] T046 [P] Write `README.md` (run + deploy, mkn10-style)
-- [ ] T047 [P] Frontend component tests (vitest + RTL): Login flow, Profile form validation, Directory render + `wa.me` link in `frontend/tests/`
+- [X] T041 [P] Multi-stage `backend/Dockerfile` + `backend/scripts/entrypoint.sh` (`alembic upgrade head` before serving)
+- [X] T042 [P] Railway config `railway.json` (api + web services, Postgres, object-storage bucket)
+- [X] T043 [P] Frontend production build config + static-serve notes in `frontend/`
+- [X] T044 Run `quickstart.md` end-to-end and fix gaps
+- [X] T045 [P] Ensure `ruff check`, `ruff format --check`, `pytest`, `vitest` all green; document `pre-commit install`
+- [X] T046 [P] Write `README.md` (run + deploy, mkn10-style)
+- [X] T047 [P] Frontend component tests (vitest + RTL): Login flow, Directory render + `wa.me` link in `frontend/tests/`
 
 ---
 
