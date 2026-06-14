@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from uuid import UUID
+from uuid import UUID, uuid4
 
 from fastapi import APIRouter, Depends, File, UploadFile
 from sqlalchemy.orm import Session as DbSession
@@ -52,8 +52,17 @@ async def upload_photo(
     settings = get_settings()
     data = await file.read()
     ext = validate_photo(file.content_type, len(data), data, settings.photo_allowed_types, settings.photo_max_bytes)
-    key = f"members/{member.id}/avatar.{ext}"
-    url = get_photo_store(settings).put(key, data, file.content_type)
+    store = get_photo_store(settings)
+    # Remove the previous object so a re-upload doesn't orphan it or serve a cached
+    # thumbnail (the URL is unique per upload, which also busts the browser cache).
+    if member.photo_url:
+        old_key = member.photo_url.replace(settings.s3_public_base_url.rstrip("/") + "/", "")
+        try:
+            store.delete(old_key)
+        except Exception:
+            logger.warning("Failed to delete old photo object %s", old_key, exc_info=True)
+    key = f"members/{member.id}/avatar-{uuid4().hex}.{ext}"
+    url = store.put(key, data, file.content_type)
     service.set_photo(db, member, url)
     return {"photo_url": url}
 

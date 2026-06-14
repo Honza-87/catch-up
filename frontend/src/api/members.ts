@@ -12,8 +12,11 @@ export const uploadPhoto = (file: File) => {
 
 export const deletePhoto = () => api.del<void>("/members/me/photo");
 
-export const searchPlaces = (q: string) =>
-  api.get<{ places: Place[] }>(`/places/search?q=${encodeURIComponent(q)}`).then((r) => r.places);
+export const searchPlaces = (q: string, country?: string) => {
+  const params = new URLSearchParams({ q });
+  if (country) params.set("country", country);
+  return api.get<{ places: Place[] }>(`/places/search?${params.toString()}`).then((r) => r.places);
+};
 
 export const fetchMembers = () =>
   api.get<{ members: MemberSummary[] }>("/members").then((r) => r.members);

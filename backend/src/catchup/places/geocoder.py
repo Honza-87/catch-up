@@ -17,6 +17,9 @@ class Geocoder(Protocol):
 
 
 class PhotonGeocoder:
+    # Public Photon (komoot) rejects requests without an identifying User-Agent (403).
+    _HEADERS = {"User-Agent": "catch-up/0.1 (class meetup app)"}
+
     def __init__(self, base_url: str) -> None:
         self._base_url = base_url.rstrip("/")
 
@@ -24,6 +27,7 @@ class PhotonGeocoder:
         resp = httpx.get(
             f"{self._base_url}/api",
             params={"q": query, "limit": limit, "layer": "city"},
+            headers=self._HEADERS,
             timeout=8.0,
         )
         resp.raise_for_status()

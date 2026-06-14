@@ -35,13 +35,19 @@ label {
 }
 
 input,
-textarea {
+textarea,
+select {
   width: 100%;
   padding: 0.55rem 0.7rem;
   border-radius: 8px;
   border: 1px solid #2a2f3a;
   background: #11141b;
   color: #e7e9ee;
+}
+
+select:disabled,
+input:disabled {
+  opacity: 0.5;
 }
 
 button {

@@ -24,13 +24,16 @@ def feature_to_place(feature: dict[str, Any]) -> dict[str, Any] | None:
     }
 
 
-def features_to_places(features: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Map and de-duplicate a list of Photon features to place dicts."""
+def features_to_places(features: list[dict[str, Any]], country: str | None = None) -> list[dict[str, Any]]:
+    """Map and de-duplicate Photon features to place dicts, optionally scoped to a country."""
+    country_code = country.upper() if country else None
     seen: set[tuple] = set()
     out: list[dict[str, Any]] = []
     for feature in features:
         place = feature_to_place(feature)
         if place is None:
+            continue
+        if country_code is not None and place["country_code"] != country_code:
             continue
         key = (place["city"], place["country_code"], round(place["lat"], 3), round(place["lng"], 3))
         if key in seen:

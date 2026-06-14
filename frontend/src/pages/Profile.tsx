@@ -6,7 +6,7 @@ import { logout, useMe } from "../api/auth";
 import { updateProfile } from "../api/members";
 import * as tripsApi from "../api/trips";
 import { PhotoUpload } from "../components/PhotoUpload";
-import { PlaceAutocomplete } from "../components/PlaceAutocomplete";
+import { PlacePicker } from "../components/PlacePicker";
 import { TripForm, type TripFormValues } from "../components/TripForm";
 import type { Place, Trip } from "../types";
 
@@ -81,7 +81,7 @@ export function Profile() {
         <input id="name" value={displayName} onChange={(e) => setDisplayName(e.target.value)} />
 
         <label>Home location</label>
-        <PlaceAutocomplete value={home} onChange={setHome} />
+        <PlacePicker value={home} onChange={setHome} />
 
         <label htmlFor="job">Job title</label>
         <input id="job" value={jobTitle} onChange={(e) => setJobTitle(e.target.value)} />

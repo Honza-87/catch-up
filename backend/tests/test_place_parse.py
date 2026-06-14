@@ -33,3 +33,14 @@ def test_features_to_places_dedupes():
     places = features_to_places(features)
     assert len(places) == 2
     assert {p["city"] for p in places} == {"Lisbon", "Porto"}
+
+
+def test_features_to_places_filters_by_country():
+    features = [
+        _feature(name="Lisbon", country="Portugal", cc="pt"),
+        _feature(name="London", country="United Kingdom", cc="gb", lng=-0.12, lat=51.5),
+    ]
+    places = features_to_places(features, country="pt")
+    assert [p["city"] for p in places] == ["Lisbon"]
+    # case-insensitive
+    assert features_to_places(features, country="GB")[0]["city"] == "London"

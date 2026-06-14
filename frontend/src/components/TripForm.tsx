@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { PlaceAutocomplete } from "./PlaceAutocomplete";
+import { PlacePicker } from "./PlacePicker";
 import type { Place, Trip } from "../types";
 
 export interface TripFormValues {
@@ -25,28 +25,6 @@ export function TripForm({
   const [note, setNote] = useState(trip?.note ?? "");
   const [error, setError] = useState<string | null>(null);
   const [saving, setSaving] = useState(false);
-
-  // FR-007: manual destination entry when the geocoder returns nothing / is down.
-  const [manual, setManual] = useState(false);
-  const [mCity, setMCity] = useState("");
-  const [mCountryCode, setMCountryCode] = useState("");
-  const [mCountryName, setMCountryName] = useState("");
-
-  function useManualPlace() {
-    if (!mCity.trim() || mCountryCode.trim().length !== 2) {
-      setError("Enter a city and a 2-letter country code.");
-      return;
-    }
-    setPlace({
-      city: mCity.trim(),
-      country_code: mCountryCode.trim().toUpperCase(),
-      country_name: mCountryName.trim() || mCountryCode.trim().toUpperCase(),
-      lat: 0,
-      lng: 0,
-    });
-    setManual(false);
-    setError(null);
-  }
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -76,27 +54,7 @@ export function TripForm({
   return (
     <form className="card" onSubmit={handleSubmit}>
       <label>Destination</label>
-      <PlaceAutocomplete value={place} onChange={setPlace} />
-
-      {!place && !manual && (
-        <button type="button" className="secondary" onClick={() => setManual(true)} style={{ marginTop: "0.4rem" }}>
-          Can't find your city? Add manually
-        </button>
-      )}
-
-      {!place && manual && (
-        <div style={{ marginTop: "0.5rem" }}>
-          <label htmlFor="m-city">City</label>
-          <input id="m-city" value={mCity} onChange={(e) => setMCity(e.target.value)} />
-          <label htmlFor="m-cc">Country code (2 letters)</label>
-          <input id="m-cc" value={mCountryCode} maxLength={2} onChange={(e) => setMCountryCode(e.target.value)} />
-          <label htmlFor="m-cn">Country name</label>
-          <input id="m-cn" value={mCountryName} onChange={(e) => setMCountryName(e.target.value)} />
-          <button type="button" onClick={useManualPlace} style={{ marginTop: "0.4rem" }}>
-            Use this place
-          </button>
-        </div>
-      )}
+      <PlacePicker value={place} onChange={setPlace} />
 
       <label htmlFor="trip-start">Start date</label>
       <input id="trip-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} />

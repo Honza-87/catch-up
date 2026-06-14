@@ -20,14 +20,14 @@ router = APIRouter(prefix="/places", tags=["places"])
 
 
 @router.get("/search")
-def search(q: str, _: Member = Depends(get_current_member)) -> dict:
+def search(q: str, country: str | None = None, _: Member = Depends(get_current_member)) -> dict:
     settings = get_settings()
     geocoder = PhotonGeocoder(settings.geocoder_url)
+    # When scoped to a country, fetch more candidates so the filtered set stays useful.
+    limit = 20 if country else 8
     try:
-        features = geocoder.search(q)
+        features = geocoder.search(q, limit=limit)
     except httpx.HTTPError as exc:
         logger.warning("Geocoder unavailable: %s", exc)
-        raise AppError(
-            "geocoder_unavailable", "Place search is unavailable; enter city + country manually.", 502
-        ) from exc
-    return {"places": features_to_places(features)}
+        raise AppError("geocoder_unavailable", "Place search is unavailable; try again shortly.", 502) from exc
+    return {"places": features_to_places(features, country=country)}
