@@ -63,6 +63,22 @@ With `NOTIFIER=console`, new-overlap digests print to the backend logs. Run it
 again with no data change → no new digest (idempotent; FR-022/023). In production
 this is a Railway **cron** service on the same image, scheduled hourly (`0 * * * *`).
 
+### Provisioning the cron worker on Railway
+
+The worker ships in the same Docker image as the API (console script
+`catchup-overlap`). Add it as a **second service** in the catch-up Railway project:
+
+1. New service → deploy from the same repo/Dockerfile as the API.
+2. Set its **Config-as-code path** to `backend/railway.worker.json` (start command
+   `catchup-overlap`, `cronSchedule: "0 * * * *"`, `restartPolicyType: NEVER` —
+   Railway runs the command once per schedule and the worker exits).
+3. Share the API's `DATABASE_URL` and notifier env (`NOTIFIER`, `RESEND_API_KEY`,
+   `EMAIL_FROM`, `OVERLAP_EMAIL_SUBJECT`) — use Railway **reference variables** so
+   the cron service points at the same Postgres and mailer as the API.
+
+No migrations run from the cron service; the API service applies
+`alembic upgrade head` on deploy and the worker reuses that schema.
+
 ## 5. Dev loop to see an overlap
 
 1. Sign in as member A; set a **home** city; add a **trip** to e.g. Lisbon
