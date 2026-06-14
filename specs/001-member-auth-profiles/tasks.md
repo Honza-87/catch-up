@@ -55,17 +55,17 @@ an empty profile; non-roster email → same neutral response; reused/expired lin
 
 ### Tests for User Story 1
 
-- [ ] T018 [P] [US1] Unit tests for token issue/verify (expiry, single-use, hash) in `backend/tests/test_tokens.py`
-- [ ] T019 [P] [US1] Smoke test sign-in flow (roster gate, neutral 202, used/expired link denied, member created on first login) in `backend/tests/test_auth_smoke.py`
+- [X] T018 [P] [US1] Unit tests for token issue/verify (expiry, single-use, hash) in `backend/tests/test_tokens.py`
+- [X] T019 [P] [US1] Smoke test sign-in flow (roster gate, neutral 202, used/expired link denied, member created on first login) in `backend/tests/test_auth_smoke.py`
 
 ### Implementation for User Story 1
 
-- [ ] T020 [P] [US1] PURE token issue/verify (random token, hash, 15-min TTL, single-use) in `backend/src/catchup/auth/tokens.py`
-- [ ] T021 [US1] Auth service (request-link → roster check + create signin_token + send via Notifier; verify → validate + upsert member + create session; logout → revoke) in `backend/src/catchup/auth/service.py` (depends T020, T010, T012)
-- [ ] T022 [US1] Auth routers (POST /auth/request-link neutral 202, GET /auth/callback, POST /auth/logout, GET /auth/me) in `backend/src/catchup/api/auth.py` (depends T021, T016)
-- [ ] T023 [P] [US1] `catchup-roster` Typer CLI (add/remove/list) in `backend/src/catchup/cli.py` (depends T010, T008)
-- [ ] T024 [US1] Register auth router + rate-limit request-link (default 5/email/hour, 20/IP/hour, configurable) in `backend/src/catchup/app.py` (depends T022)
-- [ ] T025 [P] [US1] Frontend Login page + "check inbox" + callback handling + `useAuth` hook in `frontend/src/pages/Login.tsx`, `frontend/src/api/auth.ts`
+- [X] T020 [P] [US1] PURE token issue/verify (random token, hash, 15-min TTL, single-use) in `backend/src/catchup/auth/tokens.py`
+- [X] T021 [US1] Auth service (request-link → roster check + create signin_token + send via Notifier; verify → validate + upsert member + create session; logout → revoke) in `backend/src/catchup/auth/service.py` (depends T020, T010, T012)
+- [X] T022 [US1] Auth routers (POST /auth/request-link neutral 202, GET /auth/callback, POST /auth/logout, GET /auth/me) in `backend/src/catchup/api/auth.py` (depends T021, T016)
+- [X] T023 [P] [US1] `catchup-roster` Typer CLI (add/remove/list) in `backend/src/catchup/cli.py` (depends T010, T008)
+- [X] T024 [US1] Register auth router + rate-limit request-link (default 5/email/hour, 20/IP/hour, configurable) in `backend/src/catchup/app.py` (depends T022)
+- [X] T025 [P] [US1] Frontend Login page + "check inbox" + callback handling + `useAuth` hook in `frontend/src/pages/Login.tsx`, `frontend/src/api/auth.ts`
 
 **Checkpoint**: US1 fully functional — a real classmate can sign in. MVP demoable.
 

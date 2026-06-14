@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 
 from fastapi import Depends, Request
 from sqlalchemy import select
@@ -22,10 +22,8 @@ def get_current_member(request: Request, db: DbSession = Depends(get_session)) -
     if not raw:
         raise AppError("unauthenticated", "Sign-in required.", status_code=401)
 
-    row = db.execute(
-        select(Session).where(Session.token_hash == hash_token(raw))
-    ).scalar_one_or_none()
-    now = datetime.now(timezone.utc)
+    row = db.execute(select(Session).where(Session.token_hash == hash_token(raw))).scalar_one_or_none()
+    now = datetime.now(UTC)
     if row is None or row.revoked_at is not None or row.expires_at <= now:
         raise AppError("unauthenticated", "Sign-in required.", status_code=401)
 
