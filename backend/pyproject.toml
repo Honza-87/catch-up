@@ -27,6 +27,7 @@ dependencies = [
 
 [project.scripts]
 catchup-roster = "catchup.cli:app"
+catchup-overlap = "catchup.overlaps.worker:main"
 
 [dependency-groups]
 dev = [
