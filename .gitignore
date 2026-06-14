@@ -27,6 +27,7 @@ htmlcov/
 node_modules/
 dist/
 build/
+*.tsbuildinfo
 
 # Brainstorm visual companion
 .superpowers/

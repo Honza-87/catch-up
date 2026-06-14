@@ -107,13 +107,13 @@ profile → all shared fields visible, WhatsApp opens `wa.me`.
 
 ### Tests for User Story 3
 
-- [ ] T037 [P] [US3] Smoke test directory list (joined only) + member detail in `backend/tests/test_directory_smoke.py`
+- [X] T037 [P] [US3] Smoke test directory list (joined only) + member detail in `backend/tests/test_directory_smoke.py`
 
 ### Implementation for User Story 3
 
-- [ ] T038 [US3] Extend members service: directory list (joined only, FR-016) + get-by-id in `backend/src/catchup/members/service.py` (depends T032)
-- [ ] T039 [US3] `GET /members` + `GET /members/{id}` routers in `backend/src/catchup/api/members.py` (depends T038)
-- [ ] T040 [P] [US3] Frontend Directory + MemberDetail pages + `WhatsAppButton` (`wa.me`) in `frontend/src/pages/Directory.tsx`, `frontend/src/pages/MemberDetail.tsx`, `frontend/src/components/WhatsAppButton.tsx`
+- [X] T038 [US3] Extend members service: directory list (joined only, FR-016) + get-by-id in `backend/src/catchup/members/service.py` (depends T032)
+- [X] T039 [US3] `GET /members` + `GET /members/{id}` routers in `backend/src/catchup/api/members.py` (depends T038)
+- [X] T040 [P] [US3] Frontend Directory + MemberDetail pages + `WhatsAppButton` (`wa.me`) in `frontend/src/pages/Directory.tsx`, `frontend/src/pages/MemberDetail.tsx`, `frontend/src/components/WhatsAppButton.tsx`
 
 **Checkpoint**: All three stories independently functional.
 
