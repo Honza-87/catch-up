@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import { useMe } from "./api/auth";
 import { AuthCallback } from "./pages/AuthCallback";
 import { Directory } from "./pages/Directory";
+import { Home } from "./pages/Home";
 import { Login } from "./pages/Login";
 import { MemberDetail } from "./pages/MemberDetail";
 import { Profile } from "./pages/Profile";
@@ -18,7 +19,8 @@ export function App() {
       <Route path="/auth/callback" element={<AuthCallback />} />
       {me ? (
         <>
-          <Route path="/" element={<Directory />} />
+          <Route path="/" element={<Home />} />
+          <Route path="/directory" element={<Directory />} />
           <Route path="/me" element={<Profile />} />
           <Route path="/members/:id" element={<MemberDetail />} />
           <Route path="*" element={<Navigate to="/" replace />} />

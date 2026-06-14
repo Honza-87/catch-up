@@ -22,6 +22,7 @@ class Settings(BaseSettings):
     notifier: Literal["console", "resend"] = "console"
     resend_api_key: str = ""
     email_from: str = "catch-up <login@example.com>"
+    overlap_email_subject: str = "New catch-up overlaps"
 
     # Geocoder
     geocoder_url: str = "https://photon.komoot.io"

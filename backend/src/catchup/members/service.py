@@ -2,16 +2,18 @@
 
 from __future__ import annotations
 
+from datetime import UTC, datetime
 from uuid import UUID
 
-from sqlalchemy import func, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session as DbSession
 
-from catchup.api.schemas import PlaceSchema, ProfileUpdate
+from catchup.api.schemas import ProfileUpdate
 from catchup.config import Settings
 from catchup.errors import AppError
 from catchup.members.validation import normalize_whatsapp
-from catchup.models import Member, Place
+from catchup.models import Member, Trip
+from catchup.places.service import upsert_place
 
 _PLAIN_FIELDS = ("display_name", "job_title", "company", "note")
 
@@ -20,6 +22,13 @@ def get_member(db: DbSession, member_id: UUID) -> Member:
     member = db.get(Member, member_id)
     if member is None:
         raise AppError("not_found", "No such member.", status_code=404)
+    # Attach upcoming trips (sorted) so MemberDetail renders the drawer in one call.
+    today = datetime.now(UTC).date()
+    member.trips = list(
+        db.execute(select(Trip).where(Trip.member_id == member_id, Trip.end_date >= today).order_by(Trip.start_date))
+        .scalars()
+        .all()
+    )
     return member
 
 
@@ -41,7 +50,7 @@ def update_own_profile(db: DbSession, member: Member, data: ProfileUpdate, setti
         member.whatsapp_e164 = normalize_whatsapp(raw) if raw else None
 
     if "home_place" in sent:
-        member.home_place = None if data.home_place is None else _upsert_place(db, data.home_place)
+        member.home_place = None if data.home_place is None else upsert_place(db, data.home_place)
 
     db.flush()
     return member
@@ -55,31 +64,3 @@ def set_photo(db: DbSession, member: Member, url: str) -> None:
 def clear_photo(db: DbSession, member: Member) -> None:
     member.photo_url = None
     db.flush()
-
-
-def _upsert_place(db: DbSession, place: PlaceSchema) -> Place:
-    """Reuse an existing nearby place with the same city/country, else create one."""
-    existing = (
-        db.execute(
-            select(Place).where(
-                Place.city == place.city,
-                Place.country_code == place.country_code,
-                func.abs(Place.lat - place.lat) < 0.01,
-                func.abs(Place.lng - place.lng) < 0.01,
-            )
-        )
-        .scalars()
-        .first()
-    )
-    if existing is not None:
-        return existing
-    row = Place(
-        city=place.city,
-        country_code=place.country_code,
-        country_name=place.country_name,
-        lat=place.lat,
-        lng=place.lng,
-    )
-    db.add(row)
-    db.flush()
-    return row

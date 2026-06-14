@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime
+from datetime import date, datetime
 from uuid import UUID
 
 from pydantic import BaseModel, ConfigDict, EmailStr
@@ -18,6 +18,16 @@ class PlaceSchema(BaseModel):
     lng: float
 
 
+class MemberLite(BaseModel):
+    """Minimal member identity embedded in trip/overlap responses."""
+
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    display_name: str | None
+    photo_url: str | None
+
+
 class MemberSummary(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
@@ -30,10 +40,49 @@ class MemberSummary(BaseModel):
     whatsapp_e164: str | None
 
 
+class TripSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    member: MemberLite
+    place: PlaceSchema
+    start_date: date
+    end_date: date
+    note: str | None
+
+
+class TripCreate(BaseModel):
+    place: PlaceSchema
+    start_date: date
+    end_date: date
+    note: str | None = None
+
+
+class TripUpdate(BaseModel):
+    place: PlaceSchema | None = None
+    start_date: date | None = None
+    end_date: date | None = None
+    note: str | None = None
+
+
+class OverlapSchema(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: UUID
+    other_member: MemberLite
+    kind: str
+    strength: str
+    place: PlaceSchema | None
+    country_code: str
+    start_date: date
+    end_date: date
+
+
 class MemberDetail(MemberSummary):
     email: str
     note: str | None
     created_at: datetime
+    trips: list[TripSchema] = []
 
 
 class RequestLinkBody(BaseModel):
