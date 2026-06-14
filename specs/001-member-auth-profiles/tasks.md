@@ -34,14 +34,14 @@ independent implementation and testing.
 
 **⚠️ CRITICAL**: No user story work begins until this phase is complete.
 
-- [ ] T010 Define SQLAlchemy models in `backend/src/catchup/models.py` (`member`, `place`, `roster_invite`, `signin_token`, `session`) per data-model.md
-- [ ] T011 Init alembic in `backend/alembic/` (env.py wired to config) + migration `0001_initial` creating all 5 tables + indexes (depends T010)
-- [ ] T012 [P] Notifier interface + impls: `backend/src/catchup/notify/base.py` (Protocol), `console.py` (dev), `email_resend.py` (Resend)
-- [ ] T013 [P] Geocoder interface + Photon impl in `backend/src/catchup/places/geocoder.py`
-- [ ] T014 [P] PhotoStore interface + S3 impl in `backend/src/catchup/storage/photos.py`
-- [ ] T015 FastAPI app factory in `backend/src/catchup/app.py` (error-shape handler, CORS, router registration, startup) (depends T007, T008)
-- [ ] T016 Session auth dependency (current member or 401) in `backend/src/catchup/auth/deps.py` (depends T010, T008)
-- [ ] T017 [P] Frontend skeleton: typed fetch client + error shape in `frontend/src/api/client.ts`, react-query provider + router in `frontend/src/main.tsx`
+- [X] T010 Define SQLAlchemy models in `backend/src/catchup/models.py` (`member`, `place`, `roster_invite`, `signin_token`, `session`) per data-model.md
+- [X] T011 Init alembic in `backend/alembic/` (env.py wired to config) + migration `0001_initial` creating all 5 tables + indexes (depends T010)
+- [X] T012 [P] Notifier interface + impls: `backend/src/catchup/notify/base.py` (Protocol), `console.py` (dev), `email_resend.py` (Resend)
+- [X] T013 [P] Geocoder interface + Photon impl in `backend/src/catchup/places/geocoder.py`
+- [X] T014 [P] PhotoStore interface + S3 impl in `backend/src/catchup/storage/photos.py`
+- [X] T015 FastAPI app factory in `backend/src/catchup/app.py` (error-shape handler, CORS, router registration, startup) (depends T007, T008)
+- [X] T016 Session auth dependency (current member or 401) in `backend/src/catchup/auth/deps.py` (depends T010, T008)
+- [X] T017 [P] Frontend skeleton: typed fetch client + error shape in `frontend/src/api/client.ts`, react-query provider + router in `frontend/src/main.tsx`
 
 **Checkpoint**: Foundation ready — user stories can begin.
 
