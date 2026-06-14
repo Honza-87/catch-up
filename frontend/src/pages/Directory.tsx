@@ -8,28 +8,32 @@ export function Directory() {
 
   return (
     <div className="container">
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1>Classmates</h1>
-        <Link to="/me">My profile</Link>
-      </div>
+      <h1>Classmates</h1>
+      <p className="muted">Everyone who's joined the atlas.</p>
 
       {isLoading && <p className="muted">Loading…</p>}
       {members?.length === 0 && <p className="muted">No one has joined yet.</p>}
 
-      {members?.map((m) => (
-        <Link key={m.id} to={`/members/${m.id}`} style={{ textDecoration: "none", color: "inherit" }}>
-          <div className="card row">
-            <img className="avatar" src={m.photo_url ?? undefined} alt="" />
-            <div>
-              <div style={{ fontWeight: 600 }}>{m.display_name ?? "—"}</div>
-              <div className="muted">
-                {[m.job_title, m.company].filter(Boolean).join(" · ")}
-                {m.home_place ? ` — 📍 ${m.home_place.city}, ${m.home_place.country_name}` : ""}
+      <div className="reveal" style={{ marginTop: "1rem" }}>
+        {members?.map((m) => (
+          <Link
+            key={m.id}
+            to={`/members/${m.id}`}
+            style={{ textDecoration: "none", color: "inherit", display: "block" }}
+          >
+            <div className="card directory-card row">
+              <img className="avatar" src={m.photo_url ?? undefined} alt="" />
+              <div>
+                <div style={{ fontWeight: 600, fontSize: "1.05rem" }}>{m.display_name ?? "—"}</div>
+                <div className="muted">
+                  {[m.job_title, m.company].filter(Boolean).join(" · ")}
+                  {m.home_place ? `${m.job_title || m.company ? " — " : ""}📍 ${m.home_place.city}, ${m.home_place.country_name}` : ""}
+                </div>
               </div>
             </div>
-          </div>
-        </Link>
-      ))}
+          </Link>
+        ))}
+      </div>
     </div>
   );
 }

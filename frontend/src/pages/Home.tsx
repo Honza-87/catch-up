@@ -1,6 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
 import * as eventsApi from "../api/events";
 import { fetchMembers } from "../api/members";
@@ -76,12 +75,11 @@ export function Home() {
 
   return (
     <div className="container home-layout">
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1 style={{ margin: 0 }}>Where's everyone?</h1>
-        <div className="row">
-          <Link to="/directory">Classmates</Link>
-          <Link to="/me">My profile</Link>
-        </div>
+      <div>
+        <h1>Where's everyone?</h1>
+        <p className="muted">
+          Homes, upcoming trips and invitations across the class — and where your paths cross.
+        </p>
       </div>
 
       <div className="home-grid">

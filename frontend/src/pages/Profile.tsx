@@ -1,8 +1,7 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
-import { Link } from "react-router-dom";
 
-import { logout, useMe } from "../api/auth";
+import { useMe } from "../api/auth";
 import * as eventsApi from "../api/events";
 import { updateProfile } from "../api/members";
 import * as tripsApi from "../api/trips";
@@ -59,24 +58,12 @@ export function Profile() {
     }
   }
 
-  async function onSignOut() {
-    await logout();
-    await queryClient.invalidateQueries({ queryKey: ["me"] });
-  }
-
   return (
     <div className="container">
-      <div className="row" style={{ justifyContent: "space-between" }}>
-        <h1>My profile</h1>
-        <div className="row">
-          <Link to="/">Directory</Link>
-          <button className="secondary" onClick={onSignOut}>
-            Sign out
-          </button>
-        </div>
-      </div>
+      <h1>My profile</h1>
+      <p className="muted">How classmates see you — and your home, trips & events on the map.</p>
 
-      <form className="card" onSubmit={onSave}>
+      <form className="card" onSubmit={onSave} style={{ marginTop: "1rem" }}>
         <PhotoUpload photoUrl={me.photo_url} onChange={() => queryClient.invalidateQueries({ queryKey: ["me"] })} />
 
         <label htmlFor="name">Name</label>
