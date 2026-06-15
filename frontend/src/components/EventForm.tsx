@@ -77,7 +77,16 @@ export function EventForm({
       />
 
       <label htmlFor="event-start">Start date</label>
-      <input id="event-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+      <input
+        id="event-start"
+        type="date"
+        value={start}
+        onChange={(e) => {
+          const v = e.target.value;
+          setStart(v);
+          if (!end || end < v) setEnd(v); // default end to start so its picker opens there
+        }}
+      />
 
       <label htmlFor="event-end">End date</label>
       <input id="event-end" type="date" value={end} onChange={(e) => setEnd(e.target.value)} />

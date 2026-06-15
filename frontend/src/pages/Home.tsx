@@ -1,13 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { lazy, Suspense, useState } from "react";
 
 import * as eventsApi from "../api/events";
 import { fetchMembers } from "../api/members";
 import * as overlapsApi from "../api/overlaps";
 import * as tripsApi from "../api/trips";
+import type { GlobeArc } from "../components/GlobeView";
 import { MapView, type MapMarker } from "../components/MapView";
 import { MemberDrawer } from "../components/MemberDrawer";
 import { TripsOverlapsPanel } from "../components/TripsOverlapsPanel";
+
+// Three.js is heavy — only pull the globe bundle when the user switches to it.
+const GlobeView = lazy(() => import("../components/GlobeView"));
 
 export function Home() {
   const { data: members } = useQuery({ queryKey: ["members"], queryFn: fetchMembers });
@@ -17,6 +21,7 @@ export function Home() {
 
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [drawerMemberId, setDrawerMemberId] = useState<string | null>(null);
+  const [view, setView] = useState<"map" | "globe">("map");
 
   const tripList = trips ?? [];
   const overlapList = overlaps ?? [];
@@ -57,6 +62,16 @@ export function Home() {
       })),
   ];
 
+  // Travel arcs for the globe: each trip drawn from its member's home → destination.
+  const homeByMember = new Map(
+    (members ?? []).filter((m) => m.home_place).map((m) => [m.id, m.home_place!] as const),
+  );
+  const arcs: GlobeArc[] = tripList.flatMap((t) => {
+    const home = homeByMember.get(t.member.id);
+    if (!home || (home.lat === 0 && home.lng === 0) || (t.place.lat === 0 && t.place.lng === 0)) return [];
+    return [{ startLat: home.lat, startLng: home.lng, endLat: t.place.lat, endLng: t.place.lng }];
+  });
+
   function onMarkerSelect(id: string) {
     const trip = tripList.find((t) => t.id === id);
     if (trip) {
@@ -75,16 +90,32 @@ export function Home() {
 
   return (
     <div className="container home-layout">
-      <div>
-        <h1>Where's everyone?</h1>
-        <p className="muted">
-          Homes, upcoming trips and invitations across the class — and where your paths cross.
-        </p>
+      <div className="home-head">
+        <div>
+          <h1>Where's everyone?</h1>
+          <p className="muted">
+            Homes, upcoming trips and invitations across the class — and where your paths cross.
+          </p>
+        </div>
+        <div className="view-toggle" role="tablist" aria-label="Map view">
+          <button type="button" className={view === "map" ? "active" : ""} onClick={() => setView("map")}>
+            Map
+          </button>
+          <button type="button" className={view === "globe" ? "active" : ""} onClick={() => setView("globe")}>
+            Globe
+          </button>
+        </div>
       </div>
 
       <div className="home-grid">
         <div className="home-map">
-          <MapView markers={markers} selectedId={selectedId} onSelect={onMarkerSelect} />
+          {view === "map" ? (
+            <MapView markers={markers} selectedId={selectedId} onSelect={onMarkerSelect} />
+          ) : (
+            <Suspense fallback={<div className="globe-loading muted">Loading globe…</div>}>
+              <GlobeView points={markers} arcs={arcs} selectedId={selectedId} onSelect={onMarkerSelect} />
+            </Suspense>
+          )}
         </div>
         <div className="home-panel">
           <TripsOverlapsPanel

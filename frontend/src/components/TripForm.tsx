@@ -57,7 +57,16 @@ export function TripForm({
       <PlacePicker value={place} onChange={setPlace} />
 
       <label htmlFor="trip-start">Start date</label>
-      <input id="trip-start" type="date" value={start} onChange={(e) => setStart(e.target.value)} />
+      <input
+        id="trip-start"
+        type="date"
+        value={start}
+        onChange={(e) => {
+          const v = e.target.value;
+          setStart(v);
+          if (!end || end < v) setEnd(v); // default end to start so its picker opens there
+        }}
+      />
 
       <label htmlFor="trip-end">End date</label>
       <input id="trip-end" type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
