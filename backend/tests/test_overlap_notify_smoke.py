@@ -117,3 +117,32 @@ def test_reappearance_realerts(db):
     reconcile(db, today=_PAST)
     fresh = StubNotifier()
     assert notify_new(db, fresh) == 2
+
+
+def test_opted_out_member_skipped_but_overlap_stamped(db):
+    a, b, _ = _strong_pair(db)
+    a.digest_opt_out = True
+    db.commit()
+    reconcile(db, today=_PAST)
+    stub = StubNotifier()
+
+    # Only the opted-in member is emailed...
+    assert notify_new(db, stub) == 1
+    assert [c[0] for c in stub.calls] == ["b@x.com"]
+
+    # ...yet the overlap is stamped (opted-out counts as satisfied), so no re-alert.
+    row = db.execute(select(Overlap)).scalar_one()
+    assert row.notified_at is not None
+    assert notify_new(db, StubNotifier()) == 0
+
+
+def test_both_opted_out_sends_nothing_but_stamps(db):
+    a, b, _ = _strong_pair(db)
+    a.digest_opt_out = True
+    b.digest_opt_out = True
+    db.commit()
+    reconcile(db, today=_PAST)
+
+    assert notify_new(db, StubNotifier()) == 0
+    row = db.execute(select(Overlap)).scalar_one()
+    assert row.notified_at is not None

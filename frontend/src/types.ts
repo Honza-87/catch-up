@@ -72,6 +72,7 @@ export interface EventUpdate {
 export interface MemberDetail extends MemberSummary {
   email: string;
   note: string | null;
+  digest_opt_out: boolean;
   created_at: string;
   trips: Trip[];
   events: SignificantEvent[];
@@ -95,4 +96,5 @@ export interface ProfileUpdate {
   note?: string | null;
   whatsapp_e164?: string | null;
   home_place?: Place | null;
+  digest_opt_out?: boolean;
 }

@@ -127,6 +127,13 @@ def notify_new(db: DbSession, notifier: Notifier) -> int:
     for member_id in sorted(by_member):  # deterministic send order
         overlaps = by_member[member_id]
         member = members[member_id]
+        # Opted-out members get no email, but count as "satisfied" so the overlap
+        # still stamps notified_at once the other member is sent — otherwise the
+        # pair stays pending and the other member is re-alerted every run.
+        if member.digest_opt_out:
+            for o in overlaps:
+                sent_for[o.id].add(member_id)
+            continue
         items = [_digest_item(o, member_id, members) for o in overlaps]
         try:
             notifier.send_overlap_digest(member.email, member.display_name, items)

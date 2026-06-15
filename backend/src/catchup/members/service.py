@@ -15,7 +15,7 @@ from catchup.members.validation import normalize_whatsapp
 from catchup.models import Member, SignificantEvent, Trip
 from catchup.places.service import upsert_place
 
-_PLAIN_FIELDS = ("display_name", "job_title", "company", "note")
+_PLAIN_FIELDS = ("display_name", "job_title", "company", "note", "digest_opt_out")
 
 
 def get_member(db: DbSession, member_id: UUID) -> Member:

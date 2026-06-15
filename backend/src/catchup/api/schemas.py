@@ -107,6 +107,7 @@ class EventUpdate(BaseModel):
 class MemberDetail(MemberSummary):
     email: str
     note: str | None
+    digest_opt_out: bool
     created_at: datetime
     trips: list[TripSchema] = []
     events: list[EventSchema] = []
@@ -123,3 +124,4 @@ class ProfileUpdate(BaseModel):
     note: str | None = None
     whatsapp_e164: str | None = None
     home_place: PlaceSchema | None = None
+    digest_opt_out: bool | None = None
