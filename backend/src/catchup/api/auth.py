@@ -21,6 +21,23 @@ _email_limiter = RateLimiter(_settings.ratelimit_email_per_hour)
 _ip_limiter = RateLimiter(_settings.ratelimit_ip_per_hour)
 
 
+def _client_ip(request: Request) -> str:
+    """Best-effort real client IP behind Cloudflare → Railway edge → nginx.
+
+    `request.client.host` is only the immediate proxy peer (the same for every
+    user), so prefer Cloudflare's `CF-Connecting-IP`, then the left-most
+    `X-Forwarded-For` entry. Spoofable only by reaching the origin directly
+    (bypassing the edge) — acceptable for a private, roster-gated app.
+    """
+    cf = request.headers.get("cf-connecting-ip")
+    if cf:
+        return cf.split(",")[0].strip()
+    xff = request.headers.get("x-forwarded-for")
+    if xff:
+        return xff.split(",")[0].strip()
+    return request.client.host if request.client else "unknown"
+
+
 def _set_session_cookie(response: Response, token: str, settings: Settings) -> None:
     response.set_cookie(
         key=settings.cookie_name,
@@ -38,7 +55,7 @@ def request_link(body: RequestLinkBody, request: Request, db: DbSession = Depend
     """Always returns a neutral 202; a link is emailed only for roster emails."""
     settings = get_settings()
     email = str(body.email).lower()
-    ip = request.client.host if request.client else "unknown"
+    ip = _client_ip(request)
     if _email_limiter.check(email) and _ip_limiter.check(ip):
         service.request_link(db, email, get_notifier(settings), settings)
     return {"status": "ok"}

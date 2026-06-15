@@ -12,6 +12,7 @@ from catchup.api.schemas import MemberDetail, MemberSummary, ProfileUpdate
 from catchup.auth.deps import get_current_member
 from catchup.config import get_settings
 from catchup.db import get_session
+from catchup.errors import AppError
 from catchup.members import service
 from catchup.members.validation import validate_photo
 from catchup.models import Member
@@ -50,6 +51,9 @@ async def upload_photo(
     db: DbSession = Depends(get_session),
 ) -> dict:
     settings = get_settings()
+    # Reject oversized uploads before reading the whole body into memory.
+    if file.size is not None and file.size > settings.photo_max_bytes:
+        raise AppError("image_too_large", "Photo must be 5 MB or smaller.", 422)
     data = await file.read()
     ext = validate_photo(file.content_type, len(data), data, settings.photo_allowed_types, settings.photo_max_bytes)
     store = get_photo_store(settings)
