@@ -6,13 +6,13 @@ Guidance for Claude Code working in this repo.
 
 `catch-up` — private, invite-only web app for one high-school class to track where
 members live, what they do, and their travel plans, surfacing meet-up overlaps.
-Bootstrapped 2026-06-14 with the same spec-driven workflow and tooling discipline
-as `dokturek-mkn10`. Design: `docs/superpowers/specs/2026-06-14-catchup-design.md`;
+Bootstrapped 2026-06-14 with a spec-driven workflow and disciplined tooling.
+Design: `docs/superpowers/specs/2026-06-14-catchup-design.md`;
 principles: `.specify/memory/constitution.md` (v1.0.0).
 
 ## Stack
 
-Backend mirrors `dokturek-mkn10`: Python 3.13, uv, FastAPI, SQLAlchemy 2.x,
+Backend: Python 3.13, uv, FastAPI, SQLAlchemy 2.x,
 alembic (sync), pydantic-settings v2, ruff (line 120), pytest. Frontend: React +
 TypeScript + Vite, react-query, react-leaflet (OSM tiles). Postgres = system of
 record; S3-compatible object storage for photos. Deploy: multi-stage Docker on
@@ -20,7 +20,7 @@ Railway. One repo, two codebases: `backend/`, `frontend/`.
 
 ## Workflow (the mindset)
 
-Spec-driven, trunk-based — copied from `dokturek-mkn10`:
+Spec-driven, trunk-based:
 
 1. `/speckit-constitution` — establish project principles (the non-negotiables).
 2. `/speckit-specify` — write the feature spec (`specs/NNN-name/spec.md`).
@@ -37,8 +37,7 @@ numbering), merge to `main`. `main` is the trunk.
 ## Tooling
 
 Hygiene hooks are wired (`.pre-commit-config.yaml`: trailing-whitespace,
-end-of-file-fixer, check-yaml, large-files, merge-conflict). Backend tooling lands
-with the first implementation:
+end-of-file-fixer, check-yaml, large-files, merge-conflict):
 
 ```bash
 pre-commit install
@@ -46,8 +45,7 @@ pre-commit install
 
 - **Backend** (`backend/`): `uv` env; `ruff` (lint + format, line-length 120,
   `E/W/F/I/B/UP/SIM`); `pytest` with `--strict-markers` + `smoke` marker;
-  `alembic`. Add the `ruff` + `ruff-format` hooks to `.pre-commit-config.yaml`
-  when the backend is scaffolded.
+  `alembic`.
 - **Frontend** (`frontend/`): Vite + TypeScript; vitest + React Testing Library.
 - **Deploy**: multi-stage Docker on Railway; `alembic upgrade head` on entrypoint.
 

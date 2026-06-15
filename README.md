@@ -4,7 +4,7 @@ A private, invite-only web app for one high-school graduating class to track whe
 members are in the world, what they do, and (later) their travel plans — so they can
 spot when they'll be in the same place and plan meet-ups.
 
-Built with the same spec-driven workflow and toolchain as `dokturek-mkn10`.
+Built with a spec-driven workflow.
 Design: [`docs/superpowers/specs/2026-06-14-catchup-design.md`](docs/superpowers/specs/2026-06-14-catchup-design.md) ·
 principles: [`.specify/memory/constitution.md`](.specify/memory/constitution.md).
 
