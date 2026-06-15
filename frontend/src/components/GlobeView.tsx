@@ -43,13 +43,10 @@ export default function GlobeView({
     return () => ro.disconnect();
   }, []);
 
-  // Auto-rotate + a sensible starting view, once the globe exists.
+  // A sensible starting view once the globe exists. No auto-rotate — drag to spin.
   useEffect(() => {
     const g = globeRef.current;
     if (!g || size.width === 0) return;
-    const controls = g.controls();
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 0.6;
     g.pointOfView({ lat: 25, lng: 5, altitude: 2.4 });
   }, [size.width]);
 
@@ -67,8 +64,8 @@ export default function GlobeView({
           width={size.width}
           height={size.height}
           backgroundColor="rgba(0,0,0,0)"
-          globeImageUrl="https://unpkg.com/three-globe/example/img/earth-dark.jpg"
-          atmosphereColor="#e6a07a"
+          globeImageUrl="https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg"
+          atmosphereColor="#9ec6e8"
           atmosphereAltitude={0.18}
           pointsData={located}
           pointLat={(d) => (d as MapMarker).lat}
