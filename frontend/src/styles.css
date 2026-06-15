@@ -569,3 +569,37 @@ button.secondary:hover {
   justify-content: center;
   margin-bottom: 0.5rem;
 }
+
+/* ---------- avatar crop modal ---------- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(27, 22, 10, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+.modal {
+  background: var(--paper-2);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 1.1rem 1.15rem;
+  width: 100%;
+  max-width: 360px;
+}
+.cropper-area {
+  position: relative;
+  width: 100%;
+  height: 280px;
+  background: var(--ink);
+  border-radius: var(--r);
+  overflow: hidden;
+  margin-bottom: 0.85rem;
+}
+.modal input[type="range"] {
+  width: 100%;
+  accent-color: var(--coral);
+}
