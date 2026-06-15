@@ -10,10 +10,15 @@ principles: [`.specify/memory/constitution.md`](.specify/memory/constitution.md)
 
 ## Status
 
-**Slice 001 — members, magic-link auth & profiles** is implemented: invite-roster
-passwordless sign-in, self-service profiles (name, photo, structured home location,
-job, WhatsApp), and a class directory with one-tap WhatsApp contact. Map, trips, and
-overlap detection are later slices (002+).
+**Live in production at [catch-up.online](https://catch-up.online).** Slices shipped:
+
+- **001 — members, magic-link auth & profiles:** invite-roster passwordless sign-in,
+  self-service profiles (name, photo, structured home location, job, WhatsApp), class
+  directory with one-tap WhatsApp contact.
+- **002 — map, trips & overlaps:** class world map (`react-leaflet` + OSM), trips, a
+  pure overlap-detection engine, and hourly digest emails for new overlaps (cron worker).
+  Members can opt out of digest emails from their profile.
+- **003 — significant events:** home-hosted open invitations (e.g. birthdays).
 
 ## Structure
 
@@ -64,12 +69,32 @@ npm run build                    # type-check + production build
 
 ## Deploy (Railway)
 
-Two services from this repo plus a Postgres and an object-storage bucket:
+Live at **[catch-up.online](https://catch-up.online)**. One Railway project: three
+services built from this monorepo (each sets its own **Root Directory**) plus managed
+**Postgres** and an **object-storage bucket** (photos).
 
-- **api** — `backend/` Docker image; entrypoint runs `alembic upgrade head` then
-  gunicorn. Set `DATABASE_URL`, `SESSION_SECRET`, `NOTIFIER=resend` + `RESEND_API_KEY`,
-  `S3_*`, `APP_BASE_URL`, `COOKIE_SECURE=true`.
-- **web** — `frontend/` Docker image (nginx). Set `API_URL` to the api service URL;
-  nginx serves the SPA and reverse-proxies `/api/*` to it (same-origin cookies).
+| Service | Root dir | Config file | Role |
+|---|---|---|---|
+| `frontend` | `frontend` | `railway.json` | nginx — serves the SPA, reverse-proxies `/api/*` to the backend (same-origin cookies) |
+| `backend` | `backend` | `railway.json` | gunicorn API; entrypoint runs `alembic upgrade head` on boot |
+| `worker` | `backend` | `railway.worker.json` | hourly cron `catchup-overlap` — recompute overlaps + send digests |
 
-Trunk-based: push to `main` auto-deploys.
+**Env** (set per service):
+
+- backend + worker: `DATABASE_URL` (`postgresql+psycopg://…`), `SESSION_SECRET`,
+  `NOTIFIER=resend` + `RESEND_API_KEY`, `EMAIL_FROM`, `APP_BASE_URL`, `COOKIE_SECURE=true`;
+  backend also `S3_*` (bucket credentials).
+- frontend: `API_URL=http://backend.railway.internal:8000` (private networking).
+
+**Notes:**
+
+- The `worker` shares `backend/`'s image — it differs from `backend` only by config file
+  (`railway.worker.json` = `cronSchedule` + `startCommand catchup-overlap`). Set that path
+  explicitly in the worker service's config-as-code setting; it does **not** default to it.
+- frontend nginx re-resolves the backend upstream at **runtime** (`resolver` + variable
+  `proxy_pass`, see `frontend/nginx.conf`) so a backend redeploy's new private IP doesn't
+  strand it on a dead upstream.
+- Seed the invite roster against the live DB:
+  `railway ssh --service backend catchup-roster add <email>`.
+- Trunk-based: push to `main` auto-deploys (GitHub connected; per-service watch paths
+  scope rebuilds to the folder that changed).
