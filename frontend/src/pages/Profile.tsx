@@ -23,6 +23,7 @@ export function Profile() {
   const [whatsapp, setWhatsapp] = useState("");
   const [note, setNote] = useState("");
   const [home, setHome] = useState<Place | null>(null);
+  const [digestOptOut, setDigestOptOut] = useState(false);
   const [initialised, setInitialised] = useState(false);
 
   if (isLoading) return <div className="container">Loading…</div>;
@@ -35,6 +36,7 @@ export function Profile() {
     setWhatsapp(me.whatsapp_e164 ?? "");
     setNote(me.note ?? "");
     setHome(me.home_place);
+    setDigestOptOut(me.digest_opt_out ?? false);
     setInitialised(true);
   }
 
@@ -49,6 +51,7 @@ export function Profile() {
         whatsapp_e164: whatsapp || null,
         note: note || null,
         home_place: home,
+        digest_opt_out: digestOptOut,
       });
       await queryClient.invalidateQueries({ queryKey: ["me"] });
       setSaved(true);
@@ -83,6 +86,16 @@ export function Profile() {
 
         <label htmlFor="note">Note</label>
         <textarea id="note" value={note} onChange={(e) => setNote(e.target.value)} />
+
+        <label className="row" style={{ gap: "0.5rem", marginTop: "0.75rem", cursor: "pointer" }}>
+          <input
+            type="checkbox"
+            checked={digestOptOut}
+            onChange={(e) => setDigestOptOut(e.target.checked)}
+            style={{ width: "auto" }}
+          />
+          <span>Don’t email me when classmates’ travel overlaps with mine</span>
+        </label>
 
         {error && <p className="error">{error}</p>}
         <p style={{ marginTop: "0.75rem" }}>

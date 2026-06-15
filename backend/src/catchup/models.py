@@ -9,7 +9,7 @@ from __future__ import annotations
 from datetime import date, datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import CHAR, Date, DateTime, Float, ForeignKey, Text, UniqueConstraint, func
+from sqlalchemy import CHAR, Boolean, Date, DateTime, Float, ForeignKey, Text, UniqueConstraint, func, text
 from sqlalchemy.dialects.postgresql import CITEXT
 from sqlalchemy.dialects.postgresql import UUID as PgUUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
@@ -43,6 +43,7 @@ class Member(Base):
     company: Mapped[str | None] = mapped_column(Text, nullable=True)
     whatsapp_e164: Mapped[str | None] = mapped_column(Text, nullable=True)
     note: Mapped[str | None] = mapped_column(Text, nullable=True)
+    digest_opt_out: Mapped[bool] = mapped_column(Boolean, nullable=False, default=False, server_default=text("false"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
