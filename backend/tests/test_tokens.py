@@ -5,7 +5,18 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 from catchup.auth.security import hash_token
+from catchup.auth.service import canonical_email
 from catchup.auth.tokens import issue_login_token, token_is_usable
+
+
+def test_canonical_email_maps_googlemail_to_gmail():
+    assert canonical_email("Foo.Bar@googlemail.com") == "foo.bar@gmail.com"
+    assert canonical_email("foo@gmail.com") == "foo@gmail.com"
+
+
+def test_canonical_email_leaves_other_domains():
+    assert canonical_email("Someone@Example.COM") == "someone@example.com"
+    assert canonical_email("a@posteo.de") == "a@posteo.de"
 
 
 def test_issue_login_token_hash_matches_raw():

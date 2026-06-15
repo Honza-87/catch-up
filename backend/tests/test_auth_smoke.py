@@ -64,6 +64,24 @@ def test_verify_creates_member_session_and_is_single_use(db):
     assert exc.value.code == "invalid_or_expired_link"
 
 
+def test_googlemail_and_gmail_resolve_to_one_member(db):
+    settings = get_settings()
+    # Both variants are roster-gated on their exact address...
+    db.add_all([RosterInvite(email="foo@googlemail.com"), RosterInvite(email="foo@gmail.com")])
+    db.flush()
+    notifier = CapturingNotifier()
+
+    service.request_link(db, "foo@googlemail.com", notifier, settings)
+    service.verify_link(db, _token_from_link(notifier.sent[-1][1]), settings)
+    service.request_link(db, "foo@gmail.com", notifier, settings)
+    service.verify_link(db, _token_from_link(notifier.sent[-1][1]), settings)
+
+    # ...but both land on a single member, keyed by the gmail.com canonical form.
+    members = db.execute(select(Member)).scalars().all()
+    assert len(members) == 1
+    assert members[0].email == "foo@gmail.com"
+
+
 def test_me_requires_authentication(db):
     client = TestClient(create_app())
     resp = client.get("/auth/me")

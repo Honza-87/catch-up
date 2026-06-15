@@ -25,6 +25,18 @@ class VerifiedLogin:
     session_token: str
 
 
+def canonical_email(email: str) -> str:
+    """Member-identity form of an email: lowercased, with Google's googlemail.com
+    treated as gmail.com (the same mailbox) so signing in with either domain lands
+    on one profile. Roster gating still uses the exact address."""
+    local, sep, domain = email.strip().lower().partition("@")
+    if not sep:
+        return local
+    if domain == "googlemail.com":
+        domain = "gmail.com"
+    return f"{local}@{domain}"
+
+
 def request_link(db: DbSession, email: str, notifier: Notifier, settings: Settings) -> None:
     """Issue + email a magic link, but only for roster emails. Always silent on miss."""
     invite = db.get(RosterInvite, email)
@@ -46,9 +58,10 @@ def verify_link(db: DbSession, raw_token: str, settings: Settings) -> VerifiedLo
         raise AppError("invalid_or_expired_link", "This sign-in link is invalid or expired.", status_code=400)
 
     tok.used_at = now
-    member = db.execute(select(Member).where(Member.email == tok.email)).scalar_one_or_none()
+    member_email = canonical_email(tok.email)
+    member = db.execute(select(Member).where(Member.email == member_email)).scalar_one_or_none()
     if member is None:
-        member = Member(email=tok.email)
+        member = Member(email=member_email)
         db.add(member)
         db.flush()
     member.last_login_at = now
