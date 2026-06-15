@@ -90,32 +90,32 @@ export function Home() {
 
   return (
     <div className="container home-layout">
-      <div className="home-head">
-        <div>
-          <h1>Where's everyone?</h1>
-          <p className="muted">
-            Homes, upcoming trips and invitations across the class — and where your paths cross.
-          </p>
-        </div>
-        <div className="view-toggle" role="tablist" aria-label="Map view">
-          <button type="button" className={view === "map" ? "active" : ""} onClick={() => setView("map")}>
-            Map
-          </button>
-          <button type="button" className={view === "globe" ? "active" : ""} onClick={() => setView("globe")}>
-            Globe
-          </button>
-        </div>
+      <div>
+        <h1>Where's everyone?</h1>
+        <p className="muted">
+          Homes, upcoming trips and invitations across the class — and where your paths cross.
+        </p>
       </div>
 
       <div className="home-grid">
-        <div className="home-map">
-          {view === "map" ? (
-            <MapView markers={markers} selectedId={selectedId} onSelect={onMarkerSelect} />
-          ) : (
-            <Suspense fallback={<div className="globe-loading muted">Loading globe…</div>}>
-              <GlobeView points={markers} arcs={arcs} selectedId={selectedId} onSelect={onMarkerSelect} />
-            </Suspense>
-          )}
+        <div className="home-map-col">
+          <div className="view-toggle" role="tablist" aria-label="Map view">
+            <button type="button" className={view === "map" ? "active" : ""} onClick={() => setView("map")}>
+              Map
+            </button>
+            <button type="button" className={view === "globe" ? "active" : ""} onClick={() => setView("globe")}>
+              Globe
+            </button>
+          </div>
+          <div className="home-map">
+            {view === "map" ? (
+              <MapView markers={markers} selectedId={selectedId} onSelect={onMarkerSelect} />
+            ) : (
+              <Suspense fallback={<div className="globe-loading muted">Loading globe…</div>}>
+                <GlobeView points={markers} arcs={arcs} selectedId={selectedId} onSelect={onMarkerSelect} />
+              </Suspense>
+            )}
+          </div>
         </div>
         <div className="home-panel">
           <TripsOverlapsPanel

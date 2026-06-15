@@ -370,10 +370,12 @@ button.secondary:hover {
     grid-template-columns: 1.5fr 1fr;
     align-items: start;
   }
-  .home-map {
-    height: 74vh;
+  .home-map-col {
     position: sticky;
     top: 5rem;
+  }
+  .home-map {
+    height: calc(74vh - 2.8rem);
   }
 }
 .home-map {
@@ -605,15 +607,14 @@ button.secondary:hover {
 }
 
 /* ---------- map / globe view toggle ---------- */
-.home-head {
+.home-map-col {
   display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  gap: 1rem;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 0.6rem;
 }
 .view-toggle {
   display: inline-flex;
+  align-self: flex-start;
   gap: 2px;
   padding: 3px;
   background: var(--paper);
