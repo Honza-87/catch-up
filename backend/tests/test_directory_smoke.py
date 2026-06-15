@@ -47,6 +47,17 @@ def test_directory_lists_only_joined_members(db):
     assert len(resp.json()["members"]) == 2
 
 
+def test_directory_hides_members_without_a_name(db):
+    _, raw = _signin(db, "named@example.com")
+    db.add(Member(email="blank@example.com"))  # joined but never filled the profile
+    db.commit()
+
+    resp = _client(raw).get("/members")
+    members = resp.json()["members"]
+    assert len(members) == 1
+    assert members[0]["display_name"] == "named"
+
+
 def test_member_detail_returns_profile(db):
     _, raw = _signin(db, "a@example.com")
     other_id, _ = _signin(db, "b@example.com")

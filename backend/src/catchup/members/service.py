@@ -42,8 +42,16 @@ def get_member(db: DbSession, member_id: UUID) -> Member:
 
 
 def list_directory(db: DbSession) -> list[Member]:
-    """All joined members (FR-016: a member row exists only after first sign-in)."""
-    return list(db.execute(select(Member).order_by(Member.display_name, Member.email)).scalars().all())
+    """Joined members who have started their profile (have a display name).
+
+    A row exists after first sign-in (FR-016), but someone who signed in without
+    filling anything would otherwise show as a blank card, so hide name-less rows.
+    """
+    return list(
+        db.execute(select(Member).where(Member.display_name.isnot(None)).order_by(Member.display_name, Member.email))
+        .scalars()
+        .all()
+    )
 
 
 def update_own_profile(db: DbSession, member: Member, data: ProfileUpdate, settings: Settings) -> Member:
