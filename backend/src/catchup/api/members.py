@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from uuid import UUID, uuid4
 
-from fastapi import APIRouter, Depends, File, UploadFile
+from fastapi import APIRouter, Depends, File, Response, UploadFile
 from sqlalchemy.orm import Session as DbSession
 
 from catchup.api.schemas import MemberDetail, MemberSummary, ProfileUpdate
@@ -34,6 +34,21 @@ def get_member(member_id: UUID, _: Member = Depends(get_current_member), db: DbS
     return {"member": MemberDetail.model_validate(service.get_member(db, member_id))}
 
 
+@router.get("/{member_id}/avatar")
+def get_avatar(
+    member_id: UUID,
+    _: Member = Depends(get_current_member),
+    db: DbSession = Depends(get_session),
+) -> Response:
+    """Stream a member's avatar from the private bucket. Session-gated, so the
+    bucket never needs to be public."""
+    member = db.get(Member, member_id)
+    if member is None or not member.photo_key:
+        raise AppError("not_found", "No photo.", status_code=404)
+    data, content_type = get_photo_store(get_settings()).get(member.photo_key)
+    return Response(content=data, media_type=content_type, headers={"Cache-Control": "private, max-age=3600"})
+
+
 @router.patch("/me")
 def update_me(
     body: ProfileUpdate,
@@ -57,27 +72,24 @@ async def upload_photo(
     data = await file.read()
     ext = validate_photo(file.content_type, len(data), data, settings.photo_allowed_types, settings.photo_max_bytes)
     store = get_photo_store(settings)
-    # Remove the previous object so a re-upload doesn't orphan it or serve a cached
-    # thumbnail (the URL is unique per upload, which also busts the browser cache).
-    if member.photo_url:
-        old_key = member.photo_url.replace(settings.s3_public_base_url.rstrip("/") + "/", "")
+    # Remove the previous object so a re-upload doesn't orphan it (the new key is
+    # unique per upload, and the served URL's ?v= busts the browser cache).
+    if member.photo_key:
         try:
-            store.delete(old_key)
+            store.delete(member.photo_key)
         except Exception:
-            logger.warning("Failed to delete old photo object %s", old_key, exc_info=True)
+            logger.warning("Failed to delete old photo object %s", member.photo_key, exc_info=True)
     key = f"members/{member.id}/avatar-{uuid4().hex}.{ext}"
-    url = store.put(key, data, file.content_type)
-    service.set_photo(db, member, url)
-    return {"photo_url": url}
+    store.put(key, data, file.content_type)
+    service.set_photo(db, member, key)
+    return {"photo_url": member.photo_url}
 
 
 @router.delete("/me/photo", status_code=204)
 def delete_photo(member: Member = Depends(get_current_member), db: DbSession = Depends(get_session)) -> None:
-    settings = get_settings()
-    if member.photo_url:
-        key = member.photo_url.replace(settings.s3_public_base_url.rstrip("/") + "/", "")
+    if member.photo_key:
         try:
-            get_photo_store(settings).delete(key)
+            get_photo_store(get_settings()).delete(member.photo_key)
         except Exception:
-            logger.warning("Failed to delete photo object %s", key, exc_info=True)
+            logger.warning("Failed to delete photo object %s", member.photo_key, exc_info=True)
     service.clear_photo(db, member)

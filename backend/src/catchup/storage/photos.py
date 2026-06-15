@@ -8,8 +8,12 @@ import boto3
 
 
 class PhotoStore(Protocol):
-    def put(self, key: str, data: bytes, content_type: str) -> str:
-        """Store bytes under key; return the public URL."""
+    def put(self, key: str, data: bytes, content_type: str) -> None:
+        """Store bytes under key in the (private) bucket."""
+        ...
+
+    def get(self, key: str) -> tuple[bytes, str]:
+        """Return (bytes, content_type) for the object at key; raise if absent."""
         ...
 
     def delete(self, key: str) -> None:
@@ -25,10 +29,8 @@ class S3PhotoStore:
         access_key: str,
         secret_key: str,
         region: str,
-        public_base_url: str,
     ) -> None:
         self._bucket = bucket
-        self._public_base_url = public_base_url.rstrip("/")
         self._client = boto3.client(
             "s3",
             endpoint_url=endpoint,
@@ -37,9 +39,12 @@ class S3PhotoStore:
             region_name=region,
         )
 
-    def put(self, key: str, data: bytes, content_type: str) -> str:
+    def put(self, key: str, data: bytes, content_type: str) -> None:
         self._client.put_object(Bucket=self._bucket, Key=key, Body=data, ContentType=content_type)
-        return f"{self._public_base_url}/{key}"
+
+    def get(self, key: str) -> tuple[bytes, str]:
+        obj = self._client.get_object(Bucket=self._bucket, Key=key)
+        return obj["Body"].read(), obj.get("ContentType", "application/octet-stream")
 
     def delete(self, key: str) -> None:
         self._client.delete_object(Bucket=self._bucket, Key=key)

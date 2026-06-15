@@ -6,6 +6,7 @@ Slice 002 adds: trip, overlap (see specs/002-map-trips-overlaps/data-model.md).
 
 from __future__ import annotations
 
+import hashlib
 from datetime import date, datetime
 from uuid import UUID, uuid4
 
@@ -37,7 +38,7 @@ class Member(Base):
     id: Mapped[UUID] = mapped_column(PgUUID(as_uuid=True), primary_key=True, default=uuid4)
     email: Mapped[str] = mapped_column(CITEXT, unique=True, nullable=False, index=True)
     display_name: Mapped[str | None] = mapped_column(Text, nullable=True)
-    photo_url: Mapped[str | None] = mapped_column(Text, nullable=True)
+    photo_key: Mapped[str | None] = mapped_column(Text, nullable=True)
     home_place_id: Mapped[UUID | None] = mapped_column(PgUUID(as_uuid=True), ForeignKey("place.id"), nullable=True)
     job_title: Mapped[str | None] = mapped_column(Text, nullable=True)
     company: Mapped[str | None] = mapped_column(Text, nullable=True)
@@ -48,6 +49,16 @@ class Member(Base):
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
 
     home_place: Mapped[Place | None] = relationship(lazy="joined")
+
+    @property
+    def photo_url(self) -> str | None:
+        """Path to the session-gated avatar proxy (the bucket is private; browsers
+        fetch this same-origin route with the auth cookie). `?v=` busts the cache
+        when a re-upload changes the key."""
+        if not self.photo_key:
+            return None
+        version = hashlib.sha256(self.photo_key.encode()).hexdigest()[:8]
+        return f"/api/members/{self.id}/avatar?v={version}"
 
 
 class RosterInvite(Base):

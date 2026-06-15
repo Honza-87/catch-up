@@ -65,11 +65,11 @@ def update_own_profile(db: DbSession, member: Member, data: ProfileUpdate, setti
     return member
 
 
-def set_photo(db: DbSession, member: Member, url: str) -> None:
-    member.photo_url = url
+def set_photo(db: DbSession, member: Member, key: str) -> None:
+    member.photo_key = key
     db.flush()
 
 
 def clear_photo(db: DbSession, member: Member) -> None:
-    member.photo_url = None
+    member.photo_key = None
     db.flush()

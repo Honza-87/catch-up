@@ -83,3 +83,57 @@ def test_photo_rejects_non_image(db):
     resp = client.post("/members/me/photo", files={"file": ("x.txt", b"hello", "text/plain")})
     assert resp.status_code == 422
     assert resp.json()["error"]["code"] == "invalid_image"
+
+
+class _StubStore:
+    """Stand-in PhotoStore: never touches a real bucket."""
+
+    def get(self, key: str) -> tuple[bytes, str]:
+        return b"\x89PNG-bytes", "image/png"
+
+    def put(self, key: str, data: bytes, content_type: str) -> None:  # pragma: no cover - unused
+        pass
+
+    def delete(self, key: str) -> None:  # pragma: no cover - unused
+        pass
+
+
+def _member_by_email(db, email: str) -> Member:
+    return db.execute(select(Member).where(Member.email == email)).scalar_one()
+
+
+def test_avatar_streams_for_authed_member(db, monkeypatch):
+    raw = _signin(db, "pic@example.com")
+    member = _member_by_email(db, "pic@example.com")
+    member.photo_key = f"members/{member.id}/avatar-abc.png"
+    db.commit()
+    monkeypatch.setattr("catchup.api.members.get_photo_store", lambda *_: _StubStore())
+
+    resp = _client(raw).get(f"/members/{member.id}/avatar")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "image/png"
+    assert resp.content == b"\x89PNG-bytes"
+    assert resp.headers["cache-control"] == "private, max-age=3600"
+
+
+def test_avatar_404_when_no_photo(db):
+    raw = _signin(db, "nopic@example.com")
+    member = _member_by_email(db, "nopic@example.com")
+    resp = _client(raw).get(f"/members/{member.id}/avatar")
+    assert resp.status_code == 404
+
+
+def test_avatar_requires_auth(db):
+    _signin(db, "pic2@example.com")
+    member = _member_by_email(db, "pic2@example.com")
+    resp = TestClient(create_app()).get(f"/members/{member.id}/avatar")  # no cookie
+    assert resp.status_code == 401
+
+
+def test_photo_url_is_authed_proxy_path(db):
+    raw = _signin(db, "url@example.com")
+    member = _member_by_email(db, "url@example.com")
+    member.photo_key = "members/x/avatar-y.png"
+    db.commit()
+    resp = _client(raw).get(f"/members/{member.id}")
+    assert resp.json()["member"]["photo_url"].startswith(f"/api/members/{member.id}/avatar?v=")
