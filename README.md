@@ -98,3 +98,7 @@ services built from this monorepo (each sets its own **Root Directory**) plus ma
   `railway ssh --service backend catchup-roster add <email>`.
 - Trunk-based: push to `main` auto-deploys (GitHub connected; per-service watch paths
   scope rebuilds to the folder that changed).
+
+## License
+
+[MIT](LICENSE) © Honza Chromec. Reuse permitted with attribution.
